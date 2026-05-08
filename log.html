@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <title>ソレイユ日誌｜夜ログ</title>
+
+  <style>
+    /* ==================================================
+       🌻 色の設定
+    ================================================== */
+    :root {
+      --paper: #fff9ea;
+      --ink: #4a3422;
+      --gold: #b99a55;
+      --green: #768b4b;
+      --soft: rgba(255, 249, 234, 0.9);
+    }
+
+    /* ==================================================
+       🌙 ページ全体
+    ================================================== */
+    body {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(255, 220, 120, .35), transparent 30%),
+        linear-gradient(#fff8e8, #f7efd8);
+    }
+
+    /* ==================================================
+       🌙 夜ログ画面全体
+    ================================================== */
+    .screen {
+      min-height: 100vh;
+      padding: 28px 18px 130px;
+      box-sizing: border-box;
+    }
+
+    /* ==================================================
+       🌻 ヘッダー
+    ================================================== */
+    .header {
+      text-align: center;
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      padding: 22px 12px;
+      background: var(--soft);
+      margin-bottom: 18px;
+    }
+
+    .small {
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      margin: 6px 0;
+      font-size: 34px;
+      letter-spacing: .08em;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       📜 入力カード共通
+    ================================================== */
+    .card {
+      background: var(--soft);
+      border: 1px solid #d9c38b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      color: var(--green);
+    }
+
+    /* ==================================================
+       🏷️ ラベル
+    ================================================== */
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      font-size: 14px;
+    }
+
+    /* ==================================================
+       ✏️ 入力欄共通
+    ================================================== */
+    input,
+    textarea,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6c59b;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .72);
+      padding: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 74px;
+      resize: vertical;
+    }
+
+    /* ==================================================
+       📅 日付入力欄
+       スマホで崩れにくくする設定
+    ================================================== */
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* ==================================================
+       🌅 朝ログサマリー
+       朝ログが保存されている日のみ表示
+    ================================================== */
+    .morning-summary {
+      border-color: #d9c38b;
+      background: rgba(255, 248, 220, 0.72);
+    }
+
+    .morning-summary h2 {
+      margin-top: 0;
+    }
+
+    .morning-summary div {
+      margin: 8px 0;
+      line-height: 1.7;
+    }
+
+    /* ==================================================
+       🌻 今日の丘の一言
+    ================================================== */
+    #hillCommentBox {
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    #hillCommentText {
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       ⭐ エネルギー星評価
+    ================================================== */
+    .stars button {
+      box-shadow: none;
+      background: transparent;
+      color: var(--gold);
+      font-size: 30px;
+      padding: 2px;
+      margin: 0 3px;
+      width: auto;
+    }
+
+    /* ==================================================
+       🗺️ エリア接続チェック
+    ================================================== */
+    .checks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .checks label {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ==================================================
+       🌿 フッターの指針
+    ================================================== */
+    .footer-note {
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.9;
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255, 255, 255, .65);
+      margin: 20px 0;
+    }
+
+    /* ==================================================
+       ✅ 保存完了メッセージ
+    ================================================== */
+    .notice {
+      text-align: center;
+      margin: 14px 0;
+      color: var(--green);
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       🔘 ボタン共通
+    ================================================== */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      background: #fffaf0;
+      color: var(--ink);
+      font-size: 18px;
+      font-family: inherit;
+      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    /* ==================================================
+       💾 固定保存ボタン
+       画面下に常に表示する
+    ================================================== */
+    .sticky-save {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      max-width: 520px;
+      z-index: 999;
+      background: #f6e8bd;
+      box-shadow: 0 10px 24px rgba(80, 60, 30, 0.18);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================================================
+     🌙 夜ログ画面
+  ================================================== -->
+  <section class="screen">
+
+    <!-- ========================= -->
+    <!-- 🌻 ヘッダー -->
+    <!-- ========================= -->
+    <div class="header">
+      <div class="small">Soleil Hill Daily Log</div>
+
+      <!-- ========================= -->
+      <!-- 🌅 今朝のログサマリー -->
+      <!-- morninglog.html で保存した朝ログを読み込む -->
+      <!-- ========================= -->
+      <div id="morningSummaryBox" class="card morning-summary" style="display:none;">
+        <h2>🌅 今朝のログ</h2>
+
+        <div id="morningSummaryTheme"></div>
+        <div id="morningSummaryMood"></div>
+        <div id="morningSummaryAction"></div>
+        <div id="morningSummaryAreas"></div>
+        <div id="morningSummaryCare"></div>
+        <div id="morningSummaryMessage"></div>
+      </div>
+
+      <!-- ========================= -->
+      <!-- 🌻 今日の丘の一言 -->
+      <!-- 入力内容から自動生成する短文 -->
+      <!-- ========================= -->
+      <div class="card" id="hillCommentBox">
+        <h2>🌻 今日の丘の一言</h2>
+        <div id="hillCommentText"></div>
+      </div>
+
+      <h1>今日の丘だより</h1>
+      <p>今日を記録し、わたしの内側を育てる</p>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ① 基本情報 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>① 基本情報</h2>
+
+      <label>日付</label>
+      <input type="date" id="date" onchange="loadByDate()">
+
+      <label>今日のテーマ</label>
+      <input id="theme" placeholder="例：好きなものを浴びる日">
+    </div>
+
+    <!-- ========================= -->
+    <!-- ② 今日の空気 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>② 今日の空気</h2>
+
+      <label>主感情</label>
+      <select id="mood" onchange="updateHillComment()">
+        <option>喜び</option>
+        <option>安心</option>
+        <option>静けさ</option>
+        <option>焦り</option>
+        <option>疲れ</option>
+        <option>違和感</option>
+      </select>
+
+      <label>エネルギー</label>
+      <div class="stars" id="stars">
+        <button onclick="setEnergy(1)">☆</button>
+        <button onclick="setEnergy(2)">☆</button>
+        <button onclick="setEnergy(3)">☆</button>
+        <button onclick="setEnergy(4)">☆</button>
+        <button onclick="setEnergy(5)">☆</button>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ③ 今日やったこと -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>③ 今日やったこと</h2>
+      <textarea id="done" placeholder="事実だけを書く。ドライブ、編み物、仕事、学習、外出など"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ④ 心が動いたこと -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>④ 心が動いたこと</h2>
+      <textarea id="heart" placeholder="嬉しかったこと、引っかかったこと、美しいと思ったもの"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑤ 制作ログ -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑤ 制作ログ</h2>
+      <textarea id="create" placeholder="編み物、ソレイユの丘、文章、アイデアなど"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑥ 思考ログ -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑥ 思考ログ</h2>
+      <textarea id="think" placeholder="今日気づいた構造、判断、迷い、問い"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑦ エリア接続 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑦ エリア接続</h2>
+
+      <div class="checks">
+        <label><input type="checkbox" value="図書館" class="area" onchange="updateHillComment()"> 図書館</label>
+        <label><input type="checkbox" value="アトリエ" class="area" onchange="updateHillComment()"> アトリエ</label>
+        <label><input type="checkbox" value="庭園" class="area" onchange="updateHillComment()"> 庭園</label>
+        <label><input type="checkbox" value="広場" class="area" onchange="updateHillComment()"> 広場</label>
+        <label><input type="checkbox" value="展望台" class="area" onchange="updateHillComment()"> 展望台</label>
+        <label><input type="checkbox" value="宿りの館" class="area" onchange="updateHillComment()"> 宿りの館</label>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑧ 明日に残すこと -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑧ 明日に残すこと</h2>
+      <textarea id="tomorrow" placeholder="明日やること、持ち越す気づき、1ミリ行動"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑨ 今日の一文 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑨ 今日の一文</h2>
+      <input id="oneLine" placeholder="例：好きなことを大切にした一日">
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⑩ 解釈と変換 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑩ 解釈と変換</h2>
+
+      <label>何が起きた？（事実）</label>
+      <textarea id="trigger" placeholder="今日起きた出来事をそのまま書く"></textarea>
+
+      <label>どう解釈した？</label>
+      <textarea id="interpret" placeholder="どう意味づけた？どんな前提だった？"></textarea>
+
+      <label>この感情は何を伝えている？</label>
+      <textarea id="meaning" placeholder="欲求・違和感・大切にしたいこと"></textarea>
+
+      <label>今とる最適行動</label>
+      <textarea id="action" placeholder="ここから何をする？" oninput="updateHillComment()"></textarea>
+
+      <label>やらない行動</label>
+      <textarea id="avoid" placeholder="やらないと決めること"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌿 最後の指針 -->
+    <!-- ========================= -->
+    <div class="footer-note">
+      感情は制御するものではなく、理解するもの。<br>
+      今日のわたしを、やさしく育てていこう。
+    </div>
+
+    <!-- ========================= -->
+    <!-- ✅ 保存通知 -->
+    <!-- ========================= -->
+    <div class="notice" id="notice"></div>
+
+    <!-- ========================= -->
+    <!-- 🔘 戻るボタン -->
+    <!-- ========================= -->
+    <button onclick="location.href='index.html'">
+      丘の入口へ戻る
+    </button>
+
+    <!-- ========================= -->
+    <!-- 💾 保存ボタン -->
+    <!-- ========================= -->
+    <button class="sticky-save" onclick="saveLog()">
+      保存する
+    </button>
+
+  </section>
+
+  <script>
+    /* ==================================================
+       ⭐ エネルギー値
+       0〜5で保存する
+    ================================================== */
+    let energy = 0;
+
+    /* ==================================================
+       📅 今日の日付を YYYY-MM-DD 形式で作る関数
+    ================================================== */
+    function todayString() {
+      const d = new Date();
+
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    /* ==================================================
+       📦 夜ログ一覧を取得する関数
+       localStorage の soleilLogs から読み込む
+    ================================================== */
+    function getLogs() {
+      return JSON.parse(localStorage.getItem("soleilLogs") || "{}");
+    }
+
+    /* ==================================================
+       📦 夜ログ一覧を保存する関数
+       localStorage の soleilLogs に保存する
+    ================================================== */
+    function saveLogs(logs) {
+      localStorage.setItem("soleilLogs", JSON.stringify(logs));
+    }
+
+    /* ==================================================
+       ⭐ エネルギー星を設定する関数
+    ================================================== */
+    function setEnergy(num) {
+      energy = num;
+
+      document.querySelectorAll("#stars button").forEach((btn, i) => {
+        btn.innerText = i < energy ? "★" : "☆";
+      });
+    }
+
+    /* ==================================================
+       🗺️ 選択中のエリアを取得する関数
+    ================================================== */
+    function getAreas() {
+      return Array.from(document.querySelectorAll(".area"))
+        .filter(a => a.checked)
+        .map(a => a.value);
+    }
+
+    /* ==================================================
+       🗺️ 保存済みエリアをチェックボックスへ反映する関数
+    ================================================== */
+    function setAreas(areas) {
+      document.querySelectorAll(".area").forEach(a => {
+        a.checked = areas.includes(a.value);
+      });
+    }
+
+    /* ==================================================
+       🌙 夜ログを保存する関数
+       localStorage の soleilLogs に日付キーで保存する
+    ================================================== */
+    function saveLog() {
+      const date =
+        document.getElementById("date").value || todayString();
+
+      const log = {
+        date,
+        theme: document.getElementById("theme").value,
+        mood: document.getElementById("mood").value,
+        energy,
+        done: document.getElementById("done").value,
+        heart: document.getElementById("heart").value,
+        create: document.getElementById("create").value,
+        think: document.getElementById("think").value,
+        areas: getAreas(),
+        tomorrow: document.getElementById("tomorrow").value,
+        oneLine: document.getElementById("oneLine").value,
+        trigger: document.getElementById("trigger").value,
+        interpret: document.getElementById("interpret").value,
+        meaning: document.getElementById("meaning").value,
+        action: document.getElementById("action").value,
+        avoid: document.getElementById("avoid").value,
+        savedAt: new Date().toISOString()
+      };
+
+      const logs = getLogs();
+      logs[date] = log;
+      saveLogs(logs);
+
+      const notice = document.getElementById("notice");
+
+      if (notice) {
+        notice.innerText =
+          "保存しました。今日の丘に、ひとつ花が咲きました。🌻";
+
+        setTimeout(() => {
+          notice.innerText = "";
+        }, 2600);
+      }
+
+      updateHillComment();
+    }
+
+    /* ==================================================
+       📖 日付に合わせて夜ログを読み込む関数
+       既存ログがあれば復元し、なければ空欄に戻す
+    ================================================== */
+    function loadByDate() {
+      const date =
+        document.getElementById("date").value;
+
+      if (!date) return;
+
+      const logs = getLogs();
+      const log = logs[date];
+
+      if (!log) {
+        document.getElementById("theme").value = "";
+        document.getElementById("mood").value = "喜び";
+        setEnergy(0);
+        document.getElementById("done").value = "";
+        document.getElementById("heart").value = "";
+        document.getElementById("create").value = "";
+        document.getElementById("think").value = "";
+        setAreas([]);
+        document.getElementById("tomorrow").value = "";
+        document.getElementById("oneLine").value = "";
+        document.getElementById("trigger").value = "";
+        document.getElementById("interpret").value = "";
+        document.getElementById("meaning").value = "";
+        document.getElementById("action").value = "";
+        document.getElementById("avoid").value = "";
+
+        loadMorningSummary();
+        updateHillComment();
+        return;
+      }
+
+      document.getElementById("theme").value = log.theme || "";
+      document.getElementById("mood").value = log.mood || "喜び";
+      setEnergy(log.energy || 0);
+      document.getElementById("done").value = log.done || "";
+      document.getElementById("heart").value = log.heart || "";
+      document.getElementById("create").value = log.create || "";
+      document.getElementById("think").value = log.think || "";
+      setAreas(log.areas || []);
+      document.getElementById("tomorrow").value = log.tomorrow || "";
+      document.getElementById("oneLine").value = log.oneLine || "";
+      document.getElementById("trigger").value = log.trigger || "";
+      document.getElementById("interpret").value = log.interpret || "";
+      document.getElementById("meaning").value = log.meaning || "";
+      document.getElementById("action").value = log.action || "";
+      document.getElementById("avoid").value = log.avoid || "";
+
+      loadMorningSummary();
+      updateHillComment();
+    }
+
+    /* ==================================================
+       🌅 朝ログサマリーを読み込む関数
+       localStorage の soleilMorningLogs を参照する
+    ================================================== */
+    function loadMorningSummary() {
+      const dateInput =
+        document.getElementById("date");
+
+      const date =
+        dateInput?.value || todayString();
+
+      const morningLogs =
+        JSON.parse(localStorage.getItem("soleilMorningLogs") || "{}");
+
+      const morning =
+        morningLogs[date];
+
+      const box =
+        document.getElementById("morningSummaryBox");
+
+      if (!box) return;
+
+      if (!morning) {
+        box.style.display = "none";
+        return;
+      }
+
+      box.style.display = "block";
+
+      document.getElementById("morningSummaryTheme").innerText =
+        `今日のテーマ：${morning.theme || "未記録"}`;
+
+      document.getElementById("morningSummaryMood").innerText =
+        `今朝の気分：${morning.mood || "未記録"}`;
+
+      document.getElementById("morningSummaryAction").innerText =
+        `1ミリ行動：${morning.action || "未記録"}`;
+
+      document.getElementById("morningSummaryAreas").innerText =
+        `行きたいエリア：${
+          morning.areas && morning.areas.length
+            ? morning.areas.join("・")
+            : "未記録"
+        }`;
+
+      document.getElementById("morningSummaryCare").innerText =
+        `注意点：${morning.care || "未記録"}`;
+
+      document.getElementById("morningSummaryMessage").innerText =
+        `朝の一文：${morning.message || "未記録"}`;
+    }
+
+    /* ==================================================
+       🌻 今日の丘の一言を生成する関数
+       感情・エリア・行動から短文を作る
+    ================================================== */
+    function generateHillComment() {
+      const mood =
+        document.getElementById("mood")?.value || "";
+
+      const action =
+        document.getElementById("action")?.value || "";
+
+      const checkedAreas =
+        Array.from(
+          document.querySelectorAll(".area:checked")
+        ).map(el => el.value);
+
+      let placeWord = "丘";
+
+      if (checkedAreas.includes("庭園")) {
+        placeWord = "庭園";
+      } else if (checkedAreas.includes("図書館")) {
+        placeWord = "図書館";
+      } else if (checkedAreas.includes("展望台")) {
+        placeWord = "展望台";
+      } else if (checkedAreas.includes("アトリエ")) {
+        placeWord = "アトリエ";
+      } else if (checkedAreas.includes("広場")) {
+        placeWord = "広場";
+      } else if (checkedAreas.includes("宿りの館")) {
+        placeWord = "宿りの館";
+      }
+
+      let moodWord = "静かな";
+
+      if (mood === "喜び") {
+        moodWord = "光の差す";
+      } else if (mood === "安心") {
+        moodWord = "穏やかな";
+      } else if (mood === "静けさ") {
+        moodWord = "音の澄んだ";
+      } else if (mood === "焦り") {
+        moodWord = "風の強い";
+      } else if (mood === "疲れ") {
+        moodWord = "ゆっくり休む";
+      } else if (mood === "違和感") {
+        moodWord = "小さな違和感を拾う";
+      }
+
+      const actionWord =
+        action.trim() || "小さく進む";
+
+      return `今日は、${moodWord}${placeWord}で、${actionWord}ような一日だった。`;
+    }
+
+    /* ==================================================
+       🌻 今日の丘の一言を画面に反映する関数
+    ================================================== */
+    function updateHillComment() {
+      const hillComment =
+        document.getElementById("hillCommentText");
+
+      if (!hillComment) return;
+
+      hillComment.innerText =
+        generateHillComment();
+    }
+
+    /* ==================================================
+       🌙 ページ読み込み時の初期処理
+       今日の日付をセットして、保存済みログを読み込む
+    ================================================== */
+    const dateInput =
+      document.getElementById("date");
+
+    if (dateInput && !dateInput.value) {
+      dateInput.value = todayString();
+    }
+
+    loadByDate();
+    loadMorningSummary();
+    updateHillComment();
+  </script>
+
+</body>
+
+</html>
