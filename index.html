@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ========================= -->
+  <!-- 🌻 ホーム画面用アイコン -->
+  <!-- iPhoneのホーム画面に追加したときのアイコン -->
+  <!-- ========================= -->
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <title>ソレイユ日誌</title>
+
+  <style>
+    /* ==================================================
+       🌻 色の設定
+       アプリ全体で使う基本カラー
+    ================================================== */
+    :root {
+      --paper: #fff9ea;
+      --ink: #4a3422;
+      --gold: #b99a55;
+      --green: #768b4b;
+      --soft: rgba(255, 249, 234, 0.9);
+    }
+
+    /* ==================================================
+       🌻 ページ全体
+       背景・文字・フォントの基本設定
+    ================================================== */
+    body {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: var(--ink);
+      background: linear-gradient(#ffe3b0, #fff7da);
+    }
+
+    /* ==================================================
+       🌻 ホーム画面全体
+       丘の入口として中央寄せにする
+    ================================================== */
+    .home {
+      min-height: 100vh;
+      padding: 28px 18px;
+      box-sizing: border-box;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, .8), transparent 35%),
+        linear-gradient(#ffd9a3, #fff4c9);
+    }
+
+    /* ==================================================
+       🌻 英語の小さなタイトル
+       Soleil Hill の部分
+    ================================================== */
+    .small {
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    /* ==================================================
+       🌻 メインタイトル
+       ソレイユ日誌 の部分
+    ================================================== */
+    h1 {
+      font-size: 38px;
+      margin: 0;
+      letter-spacing: .08em;
+    }
+
+    /* ==================================================
+       🌿 サブタイトル
+       丘に帰って、今日のわたしを記録する の部分
+    ================================================== */
+    .subtitle {
+      margin: 10px 0 30px;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       🌻 ミニキャラ篤史エリア全体
+       画像とコメントを横並びにする場所
+    ================================================== */
+    .atsushi-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      background: #fffdf7;
+      border: 1px solid #d8c7a0;
+      border-radius: 20px;
+
+      padding: 14px;
+      margin: 18px auto 22px;
+      max-width: 340px;
+
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* ==================================================
+       🌻 ミニキャラ篤史の画像サイズ
+       atsushi-mini-1.png / atsushi-mini-2.png を使う
+    ================================================== */
+    .atsushi-mini {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    /* ==================================================
+       💬 篤史コメントの吹き出し
+    ================================================== */
+    .atsushi-speech {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.7;
+      text-align: left;
+      color: #5c4632;
+    }
+
+    /* ==================================================
+       🌻 ひまわりアイコン
+       ふわふわ浮く飾り
+    ================================================== */
+    .atsushi {
+      font-size: 42px;
+      text-align: center;
+      margin: 12px 0;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    /* ==================================================
+       🌻 ひまわりのふわふわアニメーション
+    ================================================== */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    /* ==================================================
+       💬 時間帯別メッセージ
+       ミニキャラとは別の、丘からの一言エリア
+    ================================================== */
+    .speech {
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.8;
+
+      margin: 10px auto 24px;
+      padding: 14px 18px;
+
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.6);
+
+      width: 80%;
+      max-width: 320px;
+    }
+
+    /* ==================================================
+       🔘 メニューボタン共通
+       各ログページへ移動するボタン
+    ================================================== */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+
+      background: #fffaf0;
+      color: var(--ink);
+
+      font-size: 18px;
+      font-family: inherit;
+
+      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
+      margin-top: 12px;
+
+      width: 100%;
+      max-width: 340px;
+      align-self: center;
+    }
+
+    /* ==================================================
+       🔘 ボタンを押したときの雰囲気
+    ================================================== */
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 10px rgba(80, 50, 20, .16);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================================================
+     🌻 丘の入口
+     index.html はこのホーム画面だけにする
+  ================================================== -->
+  <section class="home" id="home">
+
+    <!-- ========================= -->
+    <!-- 🌻 タイトルエリア -->
+    <!-- ========================= -->
+    <div class="small">Soleil Hill</div>
+    <h1>ソレイユ日誌</h1>
+    <div class="subtitle">
+      丘に帰って、今日のわたしを記録する
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌻 ミニキャラ篤史エリア -->
+    <!-- 画像とコメントを表示する場所 -->
+    <!-- ========================= -->
+    <div class="atsushi-box">
+      <img
+        id="atsushiMini"
+        src="atsushi-mini-1.png"
+        class="atsushi-mini"
+        alt="ミニキャラ篤史"
+      >
+
+      <div
+        class="atsushi-speech"
+        id="atsushiSpeech">
+        おかえり、今日はどんな空気？
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌻 ひまわり飾り -->
+    <!-- ふわふわ動くアイコン -->
+    <!-- ========================= -->
+    <div class="atsushi" id="atsushi">🌻</div>
+
+    <!-- ========================= -->
+    <!-- 💬 時間帯別メッセージ -->
+    <!-- 朝・昼・夕方・夜で言葉が変わる -->
+    <!-- ========================= -->
+    <div class="speech" id="speech"></div>
+
+    <!-- ========================= -->
+    <!-- 🔘 メニューエリア -->
+    <!-- ここから各HTMLファイルへ移動する -->
+    <!-- ========================= -->
+    <button onclick="location.href='morninglog.html'">
+      朝ログを書く
+    </button>
+		
+		
+		<!-- ==================================
+  エリアログ選択ページへ移動
+  「今日はどの丘を歩く？」を選ぶページ
+======================================= -->
+<button
+  onclick="location.href='area-select.html'">
+  丘を歩く
+</button>
+			
+			
+		
+    <button onclick="location.href='log.html'">
+      夜ログを書く
+    </button>
+
+    <button onclick="location.href='archive.html'">
+      過去ログを見る
+    </button>
+
+    <button onclick="location.href='calendar.html'">
+      カレンダー
+    </button>
+
+    <button onclick="location.href='weekly.html'">
+      週次ログ
+    </button>
+
+  </section>
+
+  <script>
+    /* ==================================================
+       💬 篤史ランダムコメント一覧
+       ホーム画面を開いたときにランダムで表示
+    ================================================== */
+    const atsushiMessages = [
+      "今日はどんな丘になりそう？",
+      "無理しすぎない日にしよう🌿",
+      "小さな1ミリでも、ちゃんと前進だよ",
+      "今日は編み物日和かも🧶",
+      "図書館の空気が合いそう📚",
+      "ちゃんと休むのも、大事🙂‍↕️",
+      "今日は光がやわらかいね🌻"
+    ];
+
+    /* ==================================================
+       💬 篤史コメントをランダム表示する関数
+    ================================================== */
+    function randomAtsushiMessage() {
+      const speech =
+        document.getElementById("atsushiSpeech");
+
+      if (!speech) return;
+
+      const random =
+        atsushiMessages[
+          Math.floor(Math.random() * atsushiMessages.length)
+        ];
+
+      speech.innerText = random;
+    }
+
+    /* ==================================================
+       💬 時間帯別メッセージを取得する関数
+       朝・昼・夕方・夜で言葉を変える
+    ================================================== */
+    function getAtsushiMessage() {
+      const hour = new Date().getHours();
+
+      if (hour >= 5 && hour < 10) {
+        return [
+          "おはよう。今日はどんな光を拾う？",
+          "朝の丘は静かだね。何から始める？",
+          "小さくでもいい、今日の一歩を決めよう"
+        ];
+      }
+
+      if (hour < 17) {
+        return [
+          "いま、どのエリアにいる感じ？",
+          "いい流れ来てる？それとも整える時間？",
+          "ちょっと立ち止まってもいいよ"
+        ];
+      }
+
+      if (hour < 20) {
+        return [
+          "今日の余韻、ちゃんと拾っていこう",
+          "いい一日だった？それとも整え直す？",
+          "あと少し、やさしく締めよう"
+        ];
+      }
+
+      return [
+        "夜の丘へようこそ。今日は何が残った？",
+        "言葉にできなくても、大丈夫",
+        "ちゃんと今日を持ち帰ろう"
+      ];
+    }
+
+    /* ==================================================
+       💬 時間帯別メッセージを画面に表示する処理
+       最初に「…………………」を出してから表示
+    ================================================== */
+    function showTimeMessage() {
+      const speech =
+        document.getElementById("speech");
+
+      if (!speech) return;
+
+      const messages = getAtsushiMessage();
+
+      speech.innerText = "…………………";
+
+      setTimeout(() => {
+        speech.innerText =
+          messages[
+            Math.floor(Math.random() * messages.length)
+          ];
+      }, 1200);
+    }
+
+    /* ==================================================
+       👀 ミニキャラ篤史の瞬き処理
+       4秒ごとに画像を一瞬切り替える
+    ================================================== */
+    setInterval(() => {
+      const img =
+        document.getElementById("atsushiMini");
+
+      if (!img) return;
+
+      img.src = "atsushi-mini-2.png";
+
+      setTimeout(() => {
+        img.src = "atsushi-mini-1.png";
+      }, 180);
+
+    }, 4000);
+
+    /* ==================================================
+       🌻 ページ読み込み時の初期処理
+       入口を開いたときに最初に実行される
+    ================================================== */
+    randomAtsushiMessage();
+    showTimeMessage();
+  </script>
+
+</body>
+
+</html>
