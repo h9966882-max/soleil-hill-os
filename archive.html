@@ -1,335 +1,186 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="apple-touch-icon" href="icon.png">
 
-  <title>ソレイユ日誌｜記録書庫</title>
+  <title>丘の記録書庫｜ソレイユ日誌</title>
 
   <style>
-    /* ==================================================
-       🌻 色の設定
-    ================================================== */
-    :root {
-      --paper: #fff9ea;
-      --ink: #4a3422;
-      --gold: #b99a55;
-      --green: #768b4b;
-      --soft: rgba(255, 249, 234, 0.9);
-    }
-
-    /* ==================================================
-       📖 ページ全体
-    ================================================== */
-    body {
-      margin: 0;
-      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top right, rgba(255, 220, 120, .35), transparent 30%),
-        linear-gradient(#fff8e8, #f7efd8);
-    }
-
-    /* ==================================================
-       📖 記録書庫画面全体
-    ================================================== */
-    .screen {
-      min-height: 100vh;
-      padding: 28px 18px 80px;
+    * {
       box-sizing: border-box;
     }
 
-    /* ==================================================
-       🌻 ヘッダー
-    ================================================== */
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      min-height: 100vh;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: #3f3428;
+      background:
+        linear-gradient(
+          rgba(250, 246, 226, 0.92),
+          rgba(238, 226, 190, 0.96)
+        ),
+        url("icon.png");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .screen {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .header,
+    .month-block,
+    .archive-item,
+    .empty {
+      margin-bottom: 18px;
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255, 252, 242, 0.94);
+      border: 1px solid rgba(160, 125, 70, 0.32);
+      box-shadow: 0 8px 24px rgba(80, 60, 30, 0.12);
+    }
+
     .header {
       text-align: center;
-      border: 1px solid var(--gold);
-      border-radius: 18px;
-      padding: 22px 12px;
-      background: var(--soft);
-      margin-bottom: 18px;
     }
 
     .small {
-      font-style: italic;
-      color: var(--gold);
-      font-size: 15px;
-      margin-bottom: 6px;
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      color: #8a744d;
     }
 
     h1 {
-      margin: 6px 0;
-      font-size: 34px;
-      letter-spacing: .08em;
+      margin: 10px 0;
+      font-size: 2rem;
     }
 
-    .header p {
-      margin: 8px 0 0;
-      line-height: 1.8;
-    }
-
-    /* ==================================================
-       📜 カード共通
-    ================================================== */
-    .card {
-      background: var(--soft);
-      border: 1px solid #d9c38b;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
-    }
-
-    /* ==================================================
-       🗓️ 月ごとの折りたたみブロック
-    ================================================== */
-    .month-block {
-      margin-bottom: 18px;
-    }
-
-    /* ==================================================
-       🗓️ 月見出しボタン
-       押すとその月のログ一覧を開閉する
-    ================================================== */
     .month-header {
       width: 100%;
-      text-align: left;
-      border: 1px solid #d9c38b;
-      border-radius: 18px;
-      padding: 16px 18px;
-      margin: 0 0 12px;
-      background: rgba(255, 250, 240, .9);
-      color: var(--ink);
-      font-size: 20px;
+      border: none;
+      background: transparent;
       font-family: inherit;
-      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
+      color: #3f3428;
+      text-align: left;
+      font-size: 1.45rem;
+      cursor: pointer;
     }
 
     .month-count {
-      display: block;
-      margin-top: 4px;
-      color: var(--green);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    /* ==================================================
-       📦 月の中身
-       開閉されるログ一覧エリア
-    ================================================== */
-    .month-content {
-      display: block;
+      margin-top: 10px;
+      color: #6a7a4d;
+      font-size: 0.95rem;
     }
 
     .month-content.closed {
       display: none;
     }
 
-    /* ==================================================
-       📅 日付ごとのログ一覧カード
-    ================================================== */
     .archive-item {
-      background: rgba(255, 255, 255, .68);
-      border: 1px solid #d9c38b;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      text-align: left;
+      cursor: pointer;
     }
 
     .archive-date {
-      font-size: 20px;
+      font-size: 1.35rem;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .archive-title {
-      font-size: 18px;
-      line-height: 1.7;
-      margin: 8px 0 12px;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      margin-bottom: 10px;
     }
 
-    /* ==================================================
-       🏷️ ログ種別タグ
-    ================================================== */
+    .notice {
+      color: #6a7a4d;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
     .log-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
       margin-top: 10px;
     }
 
     .log-tag {
       display: inline-block;
-      border: 1px solid #d9c38b;
+      margin: 4px 6px 0 0;
+      padding: 5px 12px;
       border-radius: 999px;
-      padding: 5px 10px;
-      background: rgba(255, 255, 255, .75);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    /* ==================================================
-       🌿 補足メッセージ
-    ================================================== */
-    .notice {
-      color: var(--green);
-      line-height: 1.8;
+      background: rgba(255, 252, 244, 0.95);
+      border: 1px solid rgba(170, 135, 70, 0.35);
+      font-size: 0.9rem;
     }
 
     .empty {
       text-align: center;
+      line-height: 1.9;
+      color: #6f624d;
     }
 
-    /* ==================================================
-       🔘 ボタン共通
-    ================================================== */
-    button {
+    button.back-button {
+      display: block;
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px;
       border: none;
       border-radius: 999px;
-      padding: 16px 30px;
-      background: #fffaf0;
-      color: var(--ink);
-      font-size: 18px;
+      background: rgba(255, 252, 244, 0.95);
+      color: #4b3524;
       font-family: inherit;
-      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
-      margin-top: 12px;
-      width: 100%;
+      font-size: 1rem;
+      box-shadow: 0 6px 16px rgba(80, 60, 30, 0.12);
     }
-
-    button:active {
-      transform: translateY(2px);
-    }
-    
-    /* =========================================================
-  🔭 展望台ログ一覧カード
-========================================================= */
-
-.observatory-log-card {
-  margin: 14px 0;
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 250, 232, 0.94);
-  border: 1px solid rgba(178, 139, 77, 0.28);
-  box-shadow: 0 6px 18px rgba(80, 60, 30, 0.1);
-  line-height: 1.8;
-}
-
-.observatory-log-card h3 {
-  margin: 0 0 10px;
-  color: #6b4a23;
-  font-size: 1.1rem;
-}
-
-.observatory-log-meta {
-  font-size: 0.9rem;
-  color: #6f624d;
-}
-
-.observatory-log-link {
-  display: block;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 999px;
-  text-align: center;
-  text-decoration: none;
-  background: #f5e4ad;
-  color: #4b3524;
-}
-    
-    /* =========================================================
-  📚 図書館ログ一覧カード
-========================================================= */
-
-.library-log-card {
-  margin: 14px 0;
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 252, 240, 0.94);
-  border: 1px solid rgba(150, 120, 75, 0.28);
-  box-shadow: 0 6px 18px rgba(80, 60, 30, 0.1);
-  line-height: 1.8;
-}
-
-.library-log-card h3 {
-  margin: 0 0 10px;
-  color: #5f6f48;
-  font-size: 1.1rem;
-}
-
-.library-log-meta {
-  font-size: 0.9rem;
-  color: #6f624d;
-}
-
-.library-log-link {
-  display: block;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 999px;
-  text-align: center;
-  text-decoration: none;
-  background: #f5e4ad;
-  color: #4b3524;
-}
-
   </style>
 </head>
 
 <body>
+  <main class="screen">
 
-  <section class="screen">
-
-    <!-- ========================= -->
-    <!-- 🌻 ヘッダー -->
-    <!-- ========================= -->
-    <div class="header">
+    <!-- =========================================================
+      🌻 ヘッダー
+    ========================================================== -->
+    <section class="header">
       <div class="small">Soleil Hill Archive</div>
       <h1>丘の記録書庫</h1>
       <p>朝・夜・エリアの記録を、月ごとに読み返す</p>
-    </div>
+    </section>
 
-    <!-- ========================= -->
-    <!-- 📖 過去ログ一覧 -->
-    <!-- 月ごとの折りたたみ表示をここに作る -->
-    <!-- ========================= -->
-    <div id="archiveList"></div>
-    
-    <!-- ============================== -->
-    <!-- 🔭 展望台ログ一覧 -->
-    <!-- ============================== -->
-    <div id="observatoryArchive"></div>
-    
     <!-- =========================================================
-        📚 図書館ログ一覧表示エリア
-    =============================================== -->
-    <div id="libraryArchive"></div>
+      📖 過去ログ一覧
+      朝ログ・夜ログ・展望台ログ・図書館ログ・旧エリアログを統合表示
+    ========================================================== -->
+    <div id="archiveList"></div>
 
-    <!-- ========================= -->
-    <!-- 🔘 戻るボタン -->
-    <!-- ========================= -->
-    <button onclick="location.href='index.html'">
+    <!-- =========================================================
+      ◎ 戻るボタン
+    ========================================================== -->
+    <button class="back-button" onclick="location.href='index.html'">
       丘の入口へ戻る
     </button>
 
-  </section>
+  </main>
 
   <script>
-    /* ==================================================
-       📦 localStorageから安全にデータを読む関数
-    ================================================== */
+    /* =========================================================
+      📦 localStorageを読む共通関数
+    ========================================================== */
     function readStorage(key) {
-      return JSON.parse(
-        localStorage.getItem(key) || "{}"
-      );
+      return JSON.parse(localStorage.getItem(key) || "{}");
     }
 
-    /* ==================================================
-       📦 各ログを取得
-    ================================================== */
+    function readArrayStorage(key) {
+      return JSON.parse(localStorage.getItem(key) || "[]");
+    }
+
+    /* =========================================================
+      📦 各ログを取得
+    ========================================================== */
     function getAllLogStores() {
       return {
         morningLogs: readStorage("soleilMorningLogs"),
@@ -337,78 +188,98 @@
         areaLogs: readStorage("soleilAreaLogs"),
         weeklyLogs: readStorage("soleilWeeklyLogs"),
         monthlyLogs: readStorage("soleilMonthlyLogs"),
-        
-        observatoryLogs: readStorage("observatoryLogs"),
-        libraryLogs: JSON.parse(localStorage.getItem("libraryLogs")) || [],
+
+        // 🔭 展望台ログ
+        // 過去実装の差異に備えて、配列でもオブジェクトでも扱えるようにする
+        observatoryLogs: JSON.parse(localStorage.getItem("observatoryLogs") || "[]"),
+
+        // 📚 図書館ログ
+        // library-log.html は配列で保存している
+        libraryLogs: readArrayStorage("libraryLogs")
       };
-    }
-
-    /* ==================================================
-       🗺️ エリアアイコン
-    ================================================== */
-    function areaIcon(area) {
-      const icons = {
-        "図書館": "📚",
-        "アトリエ": "🎨",
-        "庭園": "🌿",
-        "広場": "👥",
-        "展望台": "🔭",
-        "宿りの館": "🕯️"
-      };
-
-      return icons[area] || "▫️";
-    }
-
-    /* ==================================================
-       🌙 感情アイコン
-    ================================================== */
-    function moodIcon(mood) {
-      const icons = {
-        "喜び": "🌻",
-        "安心": "🌿",
-        "静けさ": "🌙",
-        "焦り": "🌀",
-        "疲れ": "☕",
-        "違和感": "🔍"
-      };
-
-      return icons[mood] || "📖";
     }
 
     /* =========================================================
-  📅 全ログから日付一覧を作る関数
-  朝ログ・夜ログ・旧エリアログ・展望台ログ・図書館ログを統合する
-========================================================= */
-function collectDailyDates(stores) {
-  const dates = new Set();
+      🗺️ エリアアイコン
+    ========================================================== */
+    function areaIcon(area) {
+      const icons = {
+        "展望台": "🔭",
+        "図書館": "📚",
+        "アトリエ": "🎨",
+        "広場": "🕊️",
+        "庭園": "🌷",
+        "宿りの館": "🏡"
+      };
 
-  Object.keys(stores.morningLogs || {}).forEach(date => dates.add(date));
-  Object.keys(stores.nightLogs || {}).forEach(date => dates.add(date));
-  Object.keys(stores.areaLogs || {}).forEach(date => dates.add(date));
+      return icons[area] || "🗺️";
+    }
 
-  /* 🔭 展望台ログの日付を追加 */
-  Object.keys(stores.observatoryLogs || {}).forEach(date => dates.add(date));
+    /* =========================================================
+      🔭 展望台ログ取得
+      配列保存・日付キー保存どちらにも対応
+    ========================================================== */
+    function getObservatoryLogByDate(stores, date) {
+      const logs = stores.observatoryLogs;
 
-  /* 📚 図書館ログの日付を追加 */
-  (stores.libraryLogs || []).forEach(log => {
-    if (log.date) dates.add(log.date);
-  });
+      if (Array.isArray(logs)) {
+        return logs.find(log => log.date === date);
+      }
 
-  return Array.from(dates).sort().reverse();
-}
+      return logs?.[date];
+    }
 
-    /* ==================================================
-       🗓️ 日付を YYYY年M月 表記に変換する関数
-    ================================================== */
+    /* =========================================================
+      📚 図書館ログ取得
+      同日に複数件ある可能性がある
+    ========================================================== */
+    function getLibraryLogsByDate(stores, date) {
+      return (stores.libraryLogs || []).filter(log => log.date === date);
+    }
+
+    /* =========================================================
+      📅 全ログから日付一覧を作る
+    ========================================================== */
+    function collectDailyDates(stores) {
+      const dates = new Set();
+
+      Object.keys(stores.morningLogs || {}).forEach(date => dates.add(date));
+      Object.keys(stores.nightLogs || {}).forEach(date => dates.add(date));
+      Object.keys(stores.areaLogs || {}).forEach(date => dates.add(date));
+
+      // 🔭 展望台ログ
+      if (Array.isArray(stores.observatoryLogs)) {
+        stores.observatoryLogs.forEach(log => {
+          if (log.date) dates.add(log.date);
+        });
+      } else {
+        Object.keys(stores.observatoryLogs || {}).forEach(date => dates.add(date));
+      }
+
+      // 📚 図書館ログ
+      (stores.libraryLogs || []).forEach(log => {
+        if (log.date) dates.add(log.date);
+      });
+
+      // YYYY-MM-DD 形式だけを採用して、0年NaN月を防ぐ
+      return Array.from(dates)
+        .filter(date => /^\d{4}-\d{2}-\d{2}$/.test(date))
+        .sort()
+        .reverse();
+    }
+
+    /* =========================================================
+      🗓️ 日付を 2026年5月 表記に変換
+    ========================================================== */
     function getMonthLabel(date) {
       const [year, month] = date.split("-");
 
       return `${year}年${Number(month)}月`;
     }
 
-    /* ==================================================
-       🗓️ 日付を月ごとにまとめる関数
-    ================================================== */
+    /* =========================================================
+      🗓️ 日付を月ごとにまとめる
+    ========================================================== */
     function groupDatesByMonth(dates) {
       const groups = {};
 
@@ -426,113 +297,115 @@ function collectDailyDates(stores) {
     }
 
     /* =========================================================
-  🏷️ その日に存在するログ種別タグを作る関数
-========================================================= */
-function buildLogTags(date, stores) {
-  const tags = [];
+      🏷️ その日に存在するログ種別タグを作る
+    ========================================================== */
+    function buildLogTags(date, stores) {
+      const tags = [];
 
-  const morning = stores.morningLogs[date];
-  const night = stores.nightLogs[date];
-  const area = stores.areaLogs[date];
-
-  const observatory =
-    stores.observatoryLogs && stores.observatoryLogs[date];
-
-  const libraryLogs =
-    (stores.libraryLogs || []).filter(log => log.date === date);
-
-  if (morning) {
-    tags.push(`<span class="log-tag">🌅 朝ログ</span>`);
-  }
-
-  if (night) {
-    tags.push(`<span class="log-tag">🌙 夜ログ</span>`);
-  }
-
-  if (area) {
-    Object.keys(area).forEach(areaName => {
-      tags.push(
-        `<span class="log-tag">${areaIcon(areaName)} ${areaName}</span>`
-      );
-    });
-  }
-
-  if (observatory) {
-    tags.push(`<span class="log-tag">🔭 展望台</span>`);
-  }
-
-  if (libraryLogs.length > 0) {
-    tags.push(`<span class="log-tag">📚 図書館</span>`);
-  }
-
-  return tags.join("");
-}
-
-/* =========================================================
-  📝 一覧に出すタイトルを決める関数
-========================================================= */
-function getArchiveTitle(date, stores) {
-  const morning = stores.morningLogs[date];
-  const night = stores.nightLogs[date];
-  const area = stores.areaLogs[date];
-
-  const observatory =
-    stores.observatoryLogs && stores.observatoryLogs[date];
-
-  const libraryLogs =
-    (stores.libraryLogs || []).filter(log => log.date === date);
-
-  /* 🌙 夜ログの一文・テーマを優先 */
-  if (night?.oneLine) return night.oneLine;
-  if (night?.theme) return night.theme;
-
-  /* 🌅 朝ログ */
-  if (morning?.message) return morning.message;
-  if (morning?.theme) return morning.theme;
-
-  /* 🔭 展望台ログ */
-  if (observatory?.theme) return observatory.theme;
-  if (observatory?.nextStep) return observatory.nextStep;
-
-  /* 📚 図書館ログ */
-  if (libraryLogs.length > 0) {
-    const firstLibraryLog = libraryLogs[0];
-
-    if (firstLibraryLog.oneLine) return firstLibraryLog.oneLine;
-    if (firstLibraryLog.definition) return firstLibraryLog.definition;
-    if (firstLibraryLog.source) return firstLibraryLog.source;
-
-    return "図書館に記録がある日";
-  }
-
-  /* 🗺️ 旧エリアログ */
-  if (area) {
-    const firstAreaName = Object.keys(area)[0];
-    const firstAreaLog = area[firstAreaName];
-
-    if (firstAreaLog?.oneLine) return firstAreaLog.oneLine;
-    if (firstAreaLog?.theme) return firstAreaLog.theme;
-
-    return `${firstAreaName}に記録がある日`;
-  }
-
-  return "名前のない一日";
-}
-
-    /* ==================================================
-       📅 日付カードを作る関数
-    ================================================== */
-    function buildArchiveItem(date, stores) {
+      const morning = stores.morningLogs[date];
       const night = stores.nightLogs[date];
+      const area = stores.areaLogs[date];
+      const observatory = getObservatoryLogByDate(stores, date);
+      const libraryLogs = getLibraryLogsByDate(stores, date);
+
+      if (morning) {
+        tags.push(`<span class="log-tag">🌅 朝ログ</span>`);
+      }
+
+      if (night) {
+        tags.push(`<span class="log-tag">🌙 夜ログ</span>`);
+      }
+
+      if (area) {
+        Object.keys(area).forEach(areaName => {
+          tags.push(
+            `<span class="log-tag">${areaIcon(areaName)} ${areaName}</span>`
+          );
+        });
+      }
+
+      if (observatory) {
+        tags.push(`<span class="log-tag">🔭 展望台</span>`);
+      }
+
+      if (libraryLogs.length > 0) {
+        tags.push(`<span class="log-tag">📚 図書館</span>`);
+      }
+
+      return tags.join("");
+    }
+
+    /* =========================================================
+      📝 一覧に出すタイトルを決める
+    ========================================================== */
+    function getArchiveTitle(date, stores) {
+      const morning = stores.morningLogs[date];
+      const night = stores.nightLogs[date];
+      const area = stores.areaLogs[date];
+      const observatory = getObservatoryLogByDate(stores, date);
+      const libraryLogs = getLibraryLogsByDate(stores, date);
+
+      // 🌙 夜ログを優先
+      if (night?.oneLine) return night.oneLine;
+      if (night?.theme) return night.theme;
+
+      // 🌅 朝ログ
+      if (morning?.message) return morning.message;
+      if (morning?.theme) return morning.theme;
+
+      // 🔭 展望台ログ
+      if (observatory?.theme) return observatory.theme;
+      if (observatory?.nextStep) return observatory.nextStep;
+      if (observatory?.situation) return observatory.situation;
+
+      // 📚 図書館ログ
+      if (libraryLogs.length > 0) {
+        const firstLibraryLog = libraryLogs[0];
+
+        if (firstLibraryLog.oneLine) return firstLibraryLog.oneLine;
+        if (firstLibraryLog.definition) return firstLibraryLog.definition;
+        if (firstLibraryLog.source) return firstLibraryLog.source;
+
+        return "図書館に記録がある日";
+      }
+
+      // 🗺️ 旧エリアログ
+      if (area) {
+        const firstAreaName = Object.keys(area)[0];
+        const firstAreaLog = area[firstAreaName];
+
+        if (firstAreaLog?.oneLine) return firstAreaLog.oneLine;
+        if (firstAreaLog?.theme) return firstAreaLog.theme;
+
+        return `${firstAreaName}に記録がある日`;
+      }
+
+      return "名前のない一日";
+    }
+
+    /* =========================================================
+      🌿 一覧に出す補足文を作る
+    ========================================================== */
+    function getArchiveMeta(date, stores) {
+      const night = stores.nightLogs[date];
+
+      if (night?.mood) {
+        return `今日の主感情：${night.mood}`;
+      }
+
+      return "朝ログ・エリアログ中心の日";
+    }
+
+    /* =========================================================
+      📅 日付カードを作る
+    ========================================================== */
+    function buildArchiveItem(date, stores) {
       const title = getArchiveTitle(date, stores);
+      const meta = getArchiveMeta(date, stores);
       const tags = buildLogTags(date, stores);
 
-      const meta = night
-        ? `${moodIcon(night.mood)} ${night.mood || "未記録"} / エネルギー ${night.energy || 0}`
-        : "🌅 朝ログ・エリアログ中心の日";
-
       return `
-        <div class="archive-item" onclick="openDetail('${date}')">
+        <section class="archive-item" onclick="openDetail('${date}')">
           <div class="archive-date">${date}</div>
 
           <div class="archive-title">
@@ -546,13 +419,13 @@ function getArchiveTitle(date, stores) {
           <div class="log-tags">
             ${tags}
           </div>
-        </div>
+        </section>
       `;
     }
 
-    /* ==================================================
-       📖 過去ログ一覧を月ごとに描画する関数
-    ================================================== */
+    /* =========================================================
+      📖 過去ログ一覧を月ごとに描画
+    ========================================================== */
     function renderArchive() {
       const stores = getAllLogStores();
       const dates = collectDailyDates(stores);
@@ -562,10 +435,10 @@ function getArchiveTitle(date, stores) {
 
       if (dates.length === 0) {
         list.innerHTML = `
-          <div class="card notice empty">
+          <section class="empty">
             🌻 まだ丘の記録はありません。<br>
             朝ログや夜ログから、最初の一日を書いてみよう。
-          </div>
+          </section>
         `;
         return;
       }
@@ -575,48 +448,37 @@ function getArchiveTitle(date, stores) {
       list.innerHTML = Object.keys(groups).map((monthLabel, index) => {
         const datesInMonth = groups[monthLabel];
 
-        const monthId =
-          `month-${index}`;
-
-        const contentClass =
-          index === 0 ? "month-content" : "month-content closed";
-
-        const arrow =
-          index === 0 ? "▼" : "▶";
+        const monthId = `month-${index}`;
+        const contentClass = index === 0 ? "month-content" : "month-content closed";
+        const arrow = index === 0 ? "▼" : "▶";
 
         return `
-          <div class="month-block">
+          <section class="month-block">
             <button
               class="month-header"
-              onclick="toggleMonth('${monthId}', this)"
-            >
+              onclick="toggleMonth('${monthId}', this)">
               <span class="month-arrow">${arrow}</span>
               ${monthLabel}
-
-              <span class="month-count">
-                ${datesInMonth.length}日分の記録
-              </span>
             </button>
 
-            <div id="${monthId}" class="${contentClass}">
-              ${datesInMonth.map(date =>
-                buildArchiveItem(date, stores)
-              ).join("")}
+            <div class="month-count">
+              ${datesInMonth.length}日分の記録
             </div>
+          </section>
+
+          <div id="${monthId}" class="${contentClass}">
+            ${datesInMonth.map(date => buildArchiveItem(date, stores)).join("")}
           </div>
         `;
       }).join("");
     }
 
-    /* ==================================================
-       🗓️ 月ごとの開閉処理
-    ================================================== */
+    /* =========================================================
+      📖 月ごとの開閉処理
+    ========================================================== */
     function toggleMonth(monthId, button) {
-      const content =
-        document.getElementById(monthId);
-
-      const arrow =
-        button.querySelector(".month-arrow");
+      const content = document.getElementById(monthId);
+      const arrow = button.querySelector(".month-arrow");
 
       if (!content) return;
 
@@ -629,73 +491,18 @@ function getArchiveTitle(date, stores) {
       }
     }
 
-    /* ==================================================
-       🔎 詳細ページへ移動する関数
-    ================================================== */
+    /* =========================================================
+      🔎 詳細ページへ移動
+    ========================================================== */
     function openDetail(date) {
       location.href =
         `detail.html?date=${encodeURIComponent(date)}`;
     }
 
-/* =========================================================
-  📚 図書館ログを archive.html に表示する関数
-
-  保存元：
-  localStorage["libraryLogs"]
-
-  役割：
-  ・図書館ログを日付順に一覧表示する
-  ・クリックすると detail.html?date=YYYY-MM-DD に移動する
-========================================================= */
-function renderLibraryArchive() {
-  const box = document.getElementById("libraryArchive");
-
-  if (!box) return;
-
-  const libraryLogs =
-    JSON.parse(localStorage.getItem("libraryLogs")) || [];
-
-  if (libraryLogs.length === 0) {
-    box.innerHTML = "";
-    return;
-  }
-
-  box.innerHTML = `
-    <section>
-      <h2>📚 図書館ログ</h2>
-
-      ${libraryLogs.map(log => `
-        <div class="library-log-card">
-          <h3>📚 ${log.date}</h3>
-
-          <div class="library-log-meta">
-            <strong>学んだもの：</strong>
-            ${log.source || "未記録"}
-          </div>
-
-          <div class="library-log-meta">
-            <strong>一文圧縮：</strong>
-            ${log.oneLine || log.definition || "未記録"}
-          </div>
-
-          <a
-            class="library-log-link"
-            href="detail.html?date=${log.date}">
-            この日の記録を見る
-          </a>
-        </div>
-      `).join("")}
-    </section>
-  `;
-}
-
-    /* ==================================================
-       🌻 ページ読み込み時の初期処理
-    ================================================== */
+    /* =========================================================
+      🌻 初期表示
+    ========================================================== */
     renderArchive();
-    renderLibraryArchive();
   </script>
-
 </body>
-
 </html>
