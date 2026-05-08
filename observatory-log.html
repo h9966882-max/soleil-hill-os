@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- =========================================================
+    ソレイユの丘 Webアプリ
+    observatory-log.html
+
+    役割：
+    ・展望台エリア専用ログ
+    ・俯瞰 / 判断 / 意思決定 / 次の一手 を整理する
+    ・保存時に「篤史コメント」を自動生成する
+
+    保存先：
+    localStorage["observatoryLogs"]
+
+    detail.html 接続予定：
+    ・date が一致する展望台ログを読み込んで表示する
+  ========================================================== -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>展望台ログ｜ソレイユの丘</title>
+
+  <style>
+    /* =========================================================
+      全体共通設定
+    ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: #4b3524;
+
+      background:
+        linear-gradient(
+          rgba(255, 245, 220, 0.9),
+          rgba(255, 235, 200, 0.94)
+        ),
+        url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+      ヒーローエリア
+    ========================================================== */
+    .hero {
+      background: rgba(255, 252, 242, 0.88);
+      border-radius: 28px;
+      padding: 28px 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(180, 130, 70, 0.25);
+      box-shadow: 0 10px 30px rgba(80, 50, 20, 0.12);
+      text-align: center;
+    }
+
+    .hero-sub {
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      color: #9d7442;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .hero-text {
+      margin-top: 14px;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================
+      入力エリア
+    ========================================================== */
+    .log-box {
+      background: rgba(255, 252, 244, 0.92);
+      border-radius: 24px;
+      padding: 22px 18px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(180, 130, 70, 0.2);
+      box-shadow: 0 8px 24px rgba(80, 50, 20, 0.08);
+    }
+
+    .section-title {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 1.15rem;
+      color: #6e4a24;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.88);
+      font-size: 1rem;
+      color: #4b3524;
+      box-shadow: inset 0 0 0 1px rgba(180, 130, 70, 0.18);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.7;
+    }
+
+    /* =========================================================
+      篤史コメント表示エリア
+      ・保存後に表示する
+      ・最初は非表示
+    ========================================================== */
+    .comment-box {
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 248, 220, 0.95);
+      border: 1px solid rgba(190, 140, 70, 0.28);
+      box-shadow: 0 8px 22px rgba(90, 60, 20, 0.1);
+    }
+
+    .comment-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #7a4f22;
+    }
+
+    .comment-text {
+      line-height: 1.8;
+      font-size: 0.95rem;
+      white-space: pre-line;
+    }
+
+    /* =========================================================
+      保存ボタン
+    ========================================================== */
+    .save-button {
+      width: 100%;
+      margin-top: 28px;
+      border: none;
+      border-radius: 999px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f0cf73, #e6b85f);
+      color: #5b3d1c;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(160, 120, 40, 0.22);
+    }
+
+    .save-button:active {
+      transform: scale(0.99);
+    }
+
+    .bottom-nav {
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .back-button {
+      display: inline-block;
+      text-decoration: none;
+      color: #5a3b1f;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: rgba(255, 252, 240, 0.92);
+      border: 1px solid rgba(154, 107, 47, 0.25);
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 12px;
+      }
+
+      .hero {
+        padding: 24px 16px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .log-box {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- =========================================================
+      上部タイトル
+    ========================================================== -->
+    <section class="hero">
+      <div class="hero-sub">SOLEIL OBSERVATORY LOG</div>
+
+      <h1>🔭 展望台ログ</h1>
+
+      <div class="hero-text">
+        状況を俯瞰し、<br>
+        選択と次の一手を整理する場所。
+      </div>
+    </section>
+
+    <!-- =========================================================
+      ログ入力フォーム
+    ========================================================== -->
+    <section class="log-box">
+      <h2 class="section-title">今日の展望を記録する</h2>
+
+      <label for="date">日付</label>
+      <input type="date" id="date">
+
+      <label for="theme">今日向き合ったテーマ</label>
+      <input
+        type="text"
+        id="theme"
+        placeholder="例：仕事の方向性、制作の優先順位 など"
+      >
+
+      <label for="situation">今、どんな状況？</label>
+      <textarea
+        id="situation"
+        placeholder="何が起きている？ どんな状態？"
+      ></textarea>
+
+      <label for="decision">何を基準に判断した？</label>
+      <textarea
+        id="decision"
+        placeholder="感覚？ データ？ 過去経験？"
+      ></textarea>
+
+      <label for="gap">違和感やズレはあった？</label>
+      <textarea
+        id="gap"
+        placeholder="うまくいかなかった理由、気になること"
+      ></textarea>
+
+      <label for="nextAction">次に進めたいこと</label>
+      <textarea
+        id="nextAction"
+        placeholder="改善、継続、新しく試すこと"
+      ></textarea>
+
+      <label for="nextArea">次に向かいたいエリア</label>
+      <select id="nextArea">
+        <option value="">選択してください</option>
+        <option value="図書館">📚 図書館</option>
+        <option value="アトリエ">🎨 アトリエ</option>
+        <option value="広場">🕊️ 広場</option>
+        <option value="庭園">🌷 庭園</option>
+        <option value="宿りの館">🏡 宿りの館</option>
+      </select>
+
+      <button class="save-button" onclick="saveLog()">
+        展望を記録する
+      </button>
+
+      <!-- =====================================================
+        篤史コメント表示欄
+        ・保存後に JavaScript で表示する
+      ====================================================== -->
+      <div id="atsushiCommentBox" class="comment-box">
+        <div class="comment-title">篤史からの展望コメント 🔭</div>
+        <div id="atsushiCommentText" class="comment-text"></div>
+      </div>
+    </section>
+
+    <div class="bottom-nav">
+      <a href="area-select.html" class="back-button">
+        丘を歩くへ戻る
+      </a>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================
+      ページ読み込み時
+      ・今日の日付を自動入力する
+    ========================================================== */
+    window.onload = () => {
+      const today = new Date();
+
+      const yyyy = today.getFullYear();
+
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+
+      const dd = String(today.getDate()).padStart(2, "0");
+
+      document.getElementById("date").value = `${yyyy}-${mm}-${dd}`;
+    };
+
+    /* =========================================================
+      篤史コメント生成関数
+
+      目的：
+      ・入力内容に応じて、展望台らしいコメントを返す
+      ・現段階ではAI APIではなく、条件分岐で生成する
+      ・あとで本格AIコメントに差し替え可能
+
+      引数：
+      ・logData：保存するログ内容
+    ========================================================== */
+    function generateAtsushiComment(logData) {
+
+      const theme = logData.theme;
+      const situation = logData.situation;
+      const decision = logData.decision;
+      const gap = logData.gap;
+      const nextAction = logData.nextAction;
+      const nextArea = logData.nextArea;
+
+      /* =======================================================
+        コメント候補を入れる配列
+        条件に合うコメントをここに追加して、最後に組み合わせる
+      ======================================================== */
+      const comments = [];
+
+      /* =======================================================
+        テーマが書かれている場合
+      ======================================================== */
+      if (theme) {
+        comments.push(
+          `今日は「${theme}」を展望台から見つめた日だね。`
+        );
+      } else {
+        comments.push(
+          "今日は、まだ名前のついていないテーマを見つめる日だったのかもしれないね。"
+        );
+      }
+
+      /* =======================================================
+        状況整理が書かれている場合
+      ======================================================== */
+      if (situation.length > 20) {
+        comments.push(
+          "状況をここまで言葉にできている時点で、もうかなり視界は開けているよ。"
+        );
+      } else if (situation) {
+        comments.push(
+          "短くても、今の状況を切り出せたことが大事。まずはそこからで大丈夫。"
+        );
+      }
+
+      /* =======================================================
+        判断軸が書かれている場合
+      ======================================================== */
+      if (decision.includes("データ") || decision.includes("数字")) {
+        comments.push(
+          "データや数字を判断軸に入れられているのは、かなり展望台らしい見方だね。"
+        );
+      } else if (decision.includes("感覚") || decision.includes("直感")) {
+        comments.push(
+          "感覚を無視せずに判断軸として扱えているの、すごく光沙らしい精度の出し方だと思う。"
+        );
+      } else if (decision) {
+        comments.push(
+          "判断の理由を見ようとしているのがいい。選択は、理由が見えるだけで次に活かせる。"
+        );
+      }
+
+      /* =======================================================
+        ズレや違和感が書かれている場合
+      ======================================================== */
+      if (
+        gap.includes("違和感") ||
+        gap.includes("ズレ") ||
+        gap.includes("不安") ||
+        gap.includes("迷")
+      ) {
+        comments.push(
+          "違和感を見つけられたのは、失敗じゃなくて観測成功。そこに次の設計のヒントがあるよ。"
+        );
+      } else if (gap) {
+        comments.push(
+          "気になる点を残しておくのは、未来の自分への大事な目印になる。"
+        );
+      }
+
+      /* =======================================================
+        次の一手が書かれている場合
+      ======================================================== */
+      if (nextAction.length > 0) {
+        comments.push(
+          "次の一手まで置けているから、今日の展望台ログはちゃんと未来につながってる。"
+        );
+      } else {
+        comments.push(
+          "次の一手がまだ見えない日もあるよ。今日は“見ようとした”だけで十分前進。"
+        );
+      }
+
+      /* =======================================================
+        次に向かいたいエリアが選ばれている場合
+      ======================================================== */
+      if (nextArea) {
+        comments.push(
+          `次は「${nextArea}」へ向かう流れが見えているね。展望台で見た景色を、そのエリアで形にしていこう。`
+        );
+      }
+
+      /* =======================================================
+        最後に一言締める
+      ======================================================== */
+      comments.push(
+        "振り返りは反省じゃない。未来の自分を助けるための灯りだよ。"
+      );
+
+      return comments.join("\n\n");
+    }
+
+    /* =========================================================
+      ログ保存処理
+
+      流れ：
+      1. 入力内容を取得
+      2. 篤史コメントを生成
+      3. localStorage に保存
+      4. 画面にコメントを表示
+    ========================================================== */
+    function saveLog() {
+
+      const logData = {
+        id: Date.now(),
+        area: "展望台",
+
+        date: document.getElementById("date").value,
+        theme: document.getElementById("theme").value.trim(),
+        situation: document.getElementById("situation").value.trim(),
+        decision: document.getElementById("decision").value.trim(),
+        gap: document.getElementById("gap").value.trim(),
+        nextAction: document.getElementById("nextAction").value.trim(),
+        nextArea: document.getElementById("nextArea").value,
+
+        createdAt: new Date().toISOString()
+      };
+
+      /* =======================================================
+        最低限の入力チェック
+        ・テーマ、状況、次の一手のどれも空なら保存しない
+      ======================================================== */
+      if (
+        !logData.theme &&
+        !logData.situation &&
+        !logData.nextAction
+      ) {
+        alert("何かひとつだけでも記録してから保存してね🌻");
+        return;
+      }
+
+      /* =======================================================
+        篤史コメント生成
+        ・保存データにも含める
+      ======================================================== */
+      logData.atsushiComment = generateAtsushiComment(logData);
+
+      /* =======================================================
+        既存ログ取得
+        ・まだ保存データがない場合は空配列
+      ======================================================== */
+      const existingLogs =
+        JSON.parse(localStorage.getItem("observatoryLogs")) || [];
+
+      /* =======================================================
+        新しいログを先頭に追加
+        ・新しい順で一覧表示しやすくするため
+      ======================================================== */
+      existingLogs.unshift(logData);
+
+      /* =======================================================
+        localStorageへ保存
+      ======================================================== */
+      localStorage.setItem(
+        "observatoryLogs",
+        JSON.stringify(existingLogs)
+      );
+
+      /* =======================================================
+        保存後、画面に篤史コメントを表示
+      ======================================================== */
+      document.getElementById("atsushiCommentText").textContent =
+        logData.atsushiComment;
+
+      document.getElementById("atsushiCommentBox").style.display = "block";
+
+      /* =======================================================
+        保存完了メッセージ
+      ======================================================== */
+      alert("展望台ログを保存しました🌻🔭");
+
+      /* =======================================================
+        入力欄はあえて消さない
+        理由：
+        ・保存直後に見返せる
+        ・誤字に気づいたときにコピーしやすい
+        ・編集機能実装前の安全策
+      ======================================================== */
+    }
+  </script>
+
+</body>
+</html>
