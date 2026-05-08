@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- =========================================================
+    ソレイユの丘 Webアプリ
+    area-select.html
+
+    役割：
+    ・6種類のエリアログへ進むための「エリア選択ページ」
+    ・トップページに6ボタンを直接並べず、世界観を保ったまま導線を整理する
+
+    接続イメージ：
+    index.html
+      ↓
+    area-select.html
+      ↓
+    observatory-log.html / library-log.html / atelier-log.html
+    plaza-log.html / garden-log.html / home-log.html
+
+    今後の拡張予定：
+    ・エリア滞在率グラフへの接続
+    ・時間帯による背景変化
+    ・ミニキャラ篤史の案内コメント
+    ・エリア別の最新ログ表示
+  ========================================================== -->
+
+  <meta charset="UTF-8" />
+
+  <!-- スマホ表示を崩さないための基本設定 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>丘を歩く｜ソレイユの丘</title>
+
+  <style>
+    /* =========================================================
+      全体の基本設定
+      ・余白計算をしやすくする
+      ・スマホでも横幅がはみ出しにくくする
+    ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    /* =========================================================
+      ページ全体
+      ・ソレイユの丘らしい、やわらかい朝〜昼の丘の雰囲気
+      ・背景画像は外部URLを使用
+      ・あとで自作画像に差し替える場合は url(...) の中だけ変更すればOK
+    ========================================================== */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+      color: #4b3524;
+
+      background:
+        linear-gradient(
+          rgba(255, 248, 225, 0.88),
+          rgba(255, 238, 196, 0.93)
+        ),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    /* =========================================================
+      ページ幅の制御
+      ・スマホでは画面いっぱい
+      ・PCでは広がりすぎないよう最大幅を設定
+    ========================================================== */
+    .page {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+      ヒーローエリア
+      ・ページ上部のタイトル部分
+      ・「機能選択」ではなく「丘を歩く」雰囲気を出す場所
+    ========================================================== */
+    .hero {
+      text-align: center;
+      padding: 28px 18px 22px;
+      margin-bottom: 20px;
+
+      background: rgba(255, 252, 240, 0.84);
+      border: 1px solid rgba(194, 142, 72, 0.35);
+      border-radius: 28px;
+      box-shadow: 0 12px 32px rgba(97, 67, 32, 0.18);
+      backdrop-filter: blur(4px);
+    }
+
+    /* 小さな英字ラベル */
+    .eyebrow {
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      color: #9a6b2f;
+    }
+
+    /* ページタイトル */
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* タイトル下の説明文 */
+    .lead {
+      margin: 14px 0 0;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================
+      エリアカード一覧
+      ・6つのエリアログをカード形式で並べる
+      ・トップページではなく、このページにまとめることで導線を整理
+    ========================================================== */
+    .area-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    /* =========================================================
+      エリアカード
+      ・aタグそのものをカード化
+      ・タップしやすいように余白を広めにする
+    ========================================================== */
+    .area-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+
+      padding: 18px;
+      border-radius: 22px;
+
+      background: rgba(255, 253, 245, 0.92);
+      border: 1px solid rgba(185, 130, 58, 0.35);
+      box-shadow: 0 8px 22px rgba(88, 58, 25, 0.12);
+
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    /* PCでマウスを乗せたときの動き */
+    .area-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(88, 58, 25, 0.2);
+      background: rgba(255, 250, 232, 0.98);
+    }
+
+    /* スマホで押したときに少し沈む */
+    .area-card:active {
+      transform: scale(0.99);
+    }
+
+    /* =========================================================
+      カード上部
+      ・アイコン
+      ・エリア名
+      ・短い役割説明
+    ========================================================== */
+    .area-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    /* 丸いアイコン枠 */
+    .icon {
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 50%;
+      background: #fff1c9;
+      font-size: 1.4rem;
+      box-shadow: inset 0 0 0 1px rgba(154, 107, 47, 0.25);
+    }
+
+    /* エリア名 */
+    .area-title {
+      font-size: 1.18rem;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+    }
+
+    /* 役割の短い説明 */
+    .area-subtitle {
+      margin-top: 2px;
+      font-size: 0.84rem;
+      color: #8a6337;
+    }
+
+    /* カード本文 */
+    .area-text {
+      margin: 0;
+      line-height: 1.7;
+      font-size: 0.92rem;
+    }
+
+    /* =========================================================
+      下部エリア
+      ・トップページへ戻るボタン
+      ・小さなメッセージ
+    ========================================================== */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    /* 丘の入口へ戻るボタン */
+    .back-button {
+      display: inline-block;
+      text-decoration: none;
+      color: #5a3b1f;
+
+      padding: 12px 22px;
+      border-radius: 999px;
+
+      background: rgba(255, 252, 240, 0.9);
+      border: 1px solid rgba(154, 107, 47, 0.35);
+      box-shadow: 0 6px 18px rgba(88, 58, 25, 0.12);
+    }
+
+    .back-button:hover {
+      background: rgba(255, 247, 222, 0.98);
+    }
+
+    /* 下部の小さな言葉 */
+    .small-note {
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: #8a6337;
+      line-height: 1.6;
+    }
+
+    /* =========================================================
+      スマホ向け微調整
+      ・画面が狭いとき、タイトルや余白を少しだけ詰める
+    ========================================================== */
+    @media (max-width: 480px) {
+      body {
+        padding: 18px 12px;
+      }
+
+      .hero {
+        padding: 24px 16px 20px;
+        border-radius: 24px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .area-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- =========================================================
+    ページ全体の入れ物
+  ========================================================== -->
+  <main class="page">
+
+    <!-- =========================================================
+      上部タイトルエリア
+      ・このページの目的を世界観込みで伝える
+    ========================================================== -->
+    <section class="hero">
+      <div class="eyebrow">SOLEIL AREA LOG</div>
+
+      <h1>丘を歩く</h1>
+
+      <p class="lead">
+        今日は、どの丘を歩きますか？<br>
+        今の自分に近いエリアを選んで、記録を残しましょう。
+      </p>
+    </section>
+
+    <!-- =========================================================
+      6エリア選択カード
+      ・href のリンク先は、今後作る各ログページ名
+      ・まだページが存在しなくても、先に導線として置いておく
+    ========================================================== -->
+    <section class="area-list">
+
+      <!-- =======================================================
+        展望台ログ
+        役割：俯瞰・判断・意思決定
+        接続予定ページ：observatory-log.html
+      ======================================================== -->
+      <a class="area-card" href="observatory-log.html">
+        <div class="area-head">
+          <div class="icon">🔭</div>
+          <div>
+            <div class="area-title">展望台ログ</div>
+            <div class="area-subtitle">俯瞰・判断・意思決定</div>
+          </div>
+        </div>
+        <p class="area-text">
+          状況を高い場所から見渡し、選択の理由と次の一手を整理する場所。
+        </p>
+      </a>
+
+      <!-- =======================================================
+        図書館ログ
+        役割：学習・読書・思考整理
+        接続予定ページ：library-log.html
+      ======================================================== -->
+      <a class="area-card" href="library-log.html">
+        <div class="area-head">
+          <div class="icon">📚</div>
+          <div>
+            <div class="area-title">図書館ログ</div>
+            <div class="area-subtitle">学習・読書・思考整理</div>
+          </div>
+        </div>
+        <p class="area-text">
+          読んだこと、学んだこと、心に残った言葉を静かに整理する場所。
+        </p>
+      </a>
+
+      <!-- =======================================================
+        アトリエログ
+        役割：制作・創作・手仕事
+        接続予定ページ：atelier-log.html
+      ======================================================== -->
+      <a class="area-card" href="atelier-log.html">
+        <div class="area-head">
+          <div class="icon">🎨</div>
+          <div>
+            <div class="area-title">アトリエログ</div>
+            <div class="area-subtitle">制作・創作・手仕事</div>
+          </div>
+        </div>
+        <p class="area-text">
+          作ったもの、進んだこと、試したことを記録する制作の部屋。
+        </p>
+      </a>
+
+      <!-- =======================================================
+        広場ログ
+        役割：仕事・交流・社会接続
+        接続予定ページ：plaza-log.html
+      ======================================================== -->
+      <a class="area-card" href="plaza-log.html">
+        <div class="area-head">
+          <div class="icon">🕊️</div>
+          <div>
+            <div class="area-title">広場ログ</div>
+            <div class="area-subtitle">仕事・交流・社会接続</div>
+          </div>
+        </div>
+        <p class="area-text">
+          誰かとの関わり、届けたこと、社会との接点を記録する場所。
+        </p>
+      </a>
+
+      <!-- =======================================================
+        庭園ログ
+        役割：感情・違和感・心の変化
+        接続予定ページ：garden-log.html
+      ======================================================== -->
+      <a class="area-card" href="garden-log.html">
+        <div class="area-head">
+          <div class="icon">🌷</div>
+          <div>
+            <div class="area-title">庭園ログ</div>
+            <div class="area-subtitle">感情・違和感・心の変化</div>
+          </div>
+        </div>
+        <p class="area-text">
+          喜び、違和感、揺れ、安心。心に咲いたものを見つめる庭。
+        </p>
+      </a>
+
+      <!-- =======================================================
+        宿りの館ログ
+        役割：体調・休息・生活管理
+        接続予定ページ：home-log.html
+      ======================================================== -->
+      <a class="area-card" href="home-log.html">
+        <div class="area-head">
+          <div class="icon">🏡</div>
+          <div>
+            <div class="area-title">宿りの館ログ</div>
+            <div class="area-subtitle">体調・休息・生活管理</div>
+          </div>
+        </div>
+        <p class="area-text">
+          身体の声、休息、暮らしの整いを記録するあたたかな場所。
+        </p>
+      </a>
+
+    </section>
+
+    <!-- =========================================================
+      下部ナビゲーション
+      ・エリア選択をやめてトップページに戻るための導線
+    ========================================================== -->
+    <div class="footer">
+      <a class="back-button" href="index.html">丘の入口へ戻る</a>
+
+      <div class="small-note">
+        記録は、未来の自分を助ける小さな灯りです。
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>
