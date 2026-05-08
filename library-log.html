@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- =========================================================
+    ソレイユの丘 Webアプリ
+    library-log.html
+
+    役割：
+    ・図書館エリア専用ログ
+    ・読書 / 学習 / 思考整理 / 構造化 / 再現性 を記録する
+    ・通常ログ + 深掘りモードを持つ
+
+    保存先：
+    localStorage["libraryLogs"]
+
+    今後の接続予定：
+    ・detail.html に図書館ログを表示
+    ・archive.html に「📚 図書館ログあり」を表示
+    ・月次ログで学習傾向を分析
+  ========================================================== -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>図書館ログ｜ソレイユの丘</title>
+
+  <style>
+    /* =========================================================
+      全体共通設定
+    ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      min-height: 100vh;
+
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: #3f3428;
+
+      background:
+        linear-gradient(
+          rgba(250, 246, 226, 0.91),
+          rgba(235, 225, 195, 0.94)
+        ),
+        url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+      ヒーローエリア
+    ========================================================== */
+    .hero {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 28px 20px;
+
+      border-radius: 28px;
+      background: rgba(255, 252, 242, 0.9);
+      border: 1px solid rgba(140, 112, 70, 0.28);
+      box-shadow: 0 10px 30px rgba(70, 55, 30, 0.14);
+    }
+
+    .hero-sub {
+      margin-bottom: 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      color: #7b6a42;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .hero-text {
+      margin-top: 14px;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================
+      入力カード
+    ========================================================== */
+    .log-box {
+      margin-bottom: 18px;
+      padding: 22px 18px;
+
+      border-radius: 24px;
+      background: rgba(255, 252, 244, 0.94);
+      border: 1px solid rgba(150, 120, 75, 0.22);
+      box-shadow: 0 8px 24px rgba(70, 55, 30, 0.1);
+    }
+
+    .section-title {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+      color: #5f6f48;
+    }
+
+    .section-lead {
+      margin: 0 0 18px;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: #6f624d;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+
+      font-size: 0.92rem;
+      font-weight: bold;
+      color: #4d432f;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
+
+      background: rgba(255, 255, 255, 0.9);
+      color: #3f3428;
+
+      font-family: inherit;
+      font-size: 1rem;
+
+      box-shadow: inset 0 0 0 1px rgba(150, 120, 75, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 118px;
+      line-height: 1.7;
+    }
+
+    /* placeholder を少しやさしい色にする */
+    input::placeholder,
+    textarea::placeholder {
+      color: #9a8c72;
+      line-height: 1.7;
+    }
+
+    /* =========================================================
+      深掘りモード
+      details / summary を使うことで、必要なときだけ開ける
+    ========================================================== */
+    details {
+      margin-top: 24px;
+      padding: 16px;
+
+      border-radius: 20px;
+      background: rgba(248, 242, 220, 0.78);
+      border: 1px solid rgba(150, 120, 75, 0.22);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+      color: #5f6f48;
+      line-height: 1.7;
+    }
+
+    .deep-note {
+      margin: 12px 0 0;
+      font-size: 0.84rem;
+      line-height: 1.8;
+      color: #6f624d;
+    }
+
+    /* =========================================================
+      篤史コメント表示
+    ========================================================== */
+    .comment-box {
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+
+      border-radius: 22px;
+      background: rgba(245, 239, 205, 0.95);
+      border: 1px solid rgba(160, 130, 70, 0.28);
+      box-shadow: 0 8px 22px rgba(70, 55, 30, 0.1);
+    }
+
+    .comment-title {
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #5f6f48;
+    }
+
+    .comment-text {
+      line-height: 1.8;
+      white-space: pre-line;
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================
+      保存ボタン
+    ========================================================== */
+    .save-button {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+
+      border: none;
+      border-radius: 999px;
+
+      background: linear-gradient(135deg, #d9c989, #b9c47c);
+      color: #3f3428;
+
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: bold;
+
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(90, 80, 40, 0.2);
+    }
+
+    .save-button:active {
+      transform: scale(0.99);
+    }
+
+    /* =========================================================
+      下部ナビゲーション
+    ========================================================== */
+    .bottom-nav {
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 12px 22px;
+
+      border-radius: 999px;
+      text-decoration: none;
+
+      color: #4b3524;
+      background: rgba(255, 252, 240, 0.92);
+      border: 1px solid rgba(154, 107, 47, 0.25);
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 12px;
+      }
+
+      .hero {
+        padding: 24px 16px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .log-box {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- =========================================================
+      上部タイトル
+    ========================================================== -->
+    <section class="hero">
+      <div class="hero-sub">SOLEIL LIBRARY LOG</div>
+
+      <h1>📚 図書館ログ</h1>
+
+      <div class="hero-text">
+        学びと言葉を整理し、<br>
+        理解を構造へ変える場所。
+      </div>
+    </section>
+
+    <!-- =========================================================
+      図書館ログ入力フォーム
+    ========================================================== -->
+    <section class="log-box">
+      <h2 class="section-title">今日の学びを記録する</h2>
+
+      <p class="section-lead">
+        うまく書こうとしなくて大丈夫。<br>
+        引っかかった言葉、少し残った違和感、あとで使えそうな考えを拾っていきましょう。
+      </p>
+
+      <!-- 日付 -->
+      <label for="date">日付</label>
+      <input type="date" id="date">
+
+      <!-- インプット元 -->
+      <label for="source">今日読んだもの・学んだもの</label>
+      <input
+        type="text"
+        id="source"
+        placeholder="例：本のタイトル、講義、記事、会話、動画、ふと思いついた考え など"
+      >
+
+      <!-- 学んだこと -->
+      <label for="learning">何を学んだ？</label>
+      <textarea
+        id="learning"
+        placeholder="・どこで「なるほど」と思った？
+・今までの理解と何が違った？
+・引っかかった言葉や考え方は？
+・まだ完全には掴めていないけど、気になる部分は？"
+      ></textarea>
+
+      <!-- 一文定義 -->
+      <label for="definition">一文で定義すると？</label>
+      <textarea
+        id="definition"
+        placeholder="・つまり何の話だった？
+・一番核にある考えは？
+・「だから何？」に答えるなら？
+・60〜120文字くらいで圧縮するなら？"
+      ></textarea>
+
+      <!-- 抽象化 -->
+      <label for="abstraction">これは、どんな構造の話？</label>
+      <textarea
+        id="abstraction"
+        placeholder="・他の場面でも起きていない？
+・これは原因と結果の話？選択の話？関係性の話？
+・別分野に持っていくなら、何に似ている？
+・ソレイユの丘のどのエリアとつながりそう？"
+      ></textarea>
+
+      <!-- 再現方法 -->
+      <label for="reproducibility">どうすれば再現できそう？</label>
+      <textarea
+        id="reproducibility"
+        placeholder="・誰かに説明するなら、どんな順番で話す？
+・自分がもう一度使うなら、何を覚えておけばいい？
+・条件、手順、判断基準に分けるなら？
+・再現できないとしたら、どこが曖昧？"
+      ></textarea>
+
+      <!-- 実験設計 -->
+      <label for="experiment">小さく試すなら？</label>
+      <textarea
+        id="experiment"
+        placeholder="・明日か今週、どこで試せる？
+・まず1回だけやるなら何？
+・試した結果、何が見えたら成功？
+・逆に、うまくいかなかったら何を観察する？"
+      ></textarea>
+
+      <!-- 接続エリア -->
+      <label for="nextArea">次に接続したいエリア</label>
+      <select id="nextArea">
+        <option value="">選択してください</option>
+        <option value="展望台">🔭 展望台：判断や方針に使う</option>
+        <option value="アトリエ">🎨 アトリエ：制作に落とし込む</option>
+        <option value="広場">🕊️ 広場：誰かに届ける・仕事に使う</option>
+        <option value="庭園">🌷 庭園：感情や違和感を見つめる</option>
+        <option value="宿りの館">🏡 宿りの館：暮らしや休息に活かす</option>
+      </select>
+
+      <!-- 今日の圧縮 -->
+      <label for="oneLine">今日の一文圧縮</label>
+      <textarea
+        id="oneLine"
+        placeholder="・今日の学びを一文で残すなら？
+・未来の自分に渡すメモにするなら？
+・あとで見返した時に、思い出せる言葉は？"
+      ></textarea>
+
+      <!-- =====================================================
+        深掘りモード
+        普段は閉じておける。上級ログとして使う。
+      ====================================================== -->
+      <details>
+        <summary>📚 深掘りモードを開く</summary>
+
+        <p class="deep-note">
+          ここは余力がある日だけでOK。<br>
+          「理解した気がする」を、判断・説明・実験に変えるための上級欄です。
+        </p>
+
+        <!-- 逆方向思考 -->
+        <label for="reverseThinking">逆から考えると？</label>
+        <textarea
+          id="reverseThinking"
+          placeholder="・この考えが間違うとしたら、どんな時？
+・反対意見を出すなら？
+・あえて逆の立場に立つと、何が見える？
+・この知識を使わない方がいい場面は？"
+        ></textarea>
+
+        <!-- 3分説明 -->
+        <label for="threeMinuteExplain">3分で説明するなら？</label>
+        <textarea
+          id="threeMinuteExplain"
+          placeholder="・前提は何？
+・最初に何から話す？
+・例え話を使うなら？
+・相手が納得する順番に並べるなら？"
+        ></textarea>
+
+        <!-- 意思決定接続 -->
+        <label for="decisionConnection">意思決定にどう接続する？</label>
+        <textarea
+          id="decisionConnection"
+          placeholder="・この理解があると、何を選びやすくなる？
+・逆に、何を避けられる？
+・優先順位、仕事、制作、人間関係、休息の判断で変わることは？
+・次に展望台ログを書くなら、どんな問いにつながる？"
+        ></textarea>
+
+        <!-- 理解レベル -->
+        <label for="understandingLevel">理解レベル</label>
+        <select id="understandingLevel">
+          <option value="">選択してください</option>
+          <option value="1">Lv.1：言葉だけ拾えた</option>
+          <option value="2">Lv.2：なんとなく意味はわかる</option>
+          <option value="3">Lv.3：自分の言葉で説明できる</option>
+          <option value="4">Lv.4：別の場面に応用できる</option>
+          <option value="5">Lv.5：人に教えられる</option>
+        </select>
+
+        <!-- 時間差レビュー -->
+        <label for="reviewPoint">あとで見返す時の観察点</label>
+        <textarea
+          id="reviewPoint"
+          placeholder="・1週間後に確認したいことは？
+・実際に使えたか？
+・今の理解で浅い部分はどこ？
+・あとで再読したい箇所は？"
+        ></textarea>
+      </details>
+
+      <!-- 保存ボタン -->
+      <button class="save-button" onclick="saveLog()">
+        図書館ログを保存する
+      </button>
+
+      <!-- 篤史コメント表示欄 -->
+      <div id="atsushiCommentBox" class="comment-box">
+        <div class="comment-title">篤史からの図書館コメント 📚</div>
+        <div id="atsushiCommentText" class="comment-text"></div>
+      </div>
+    </section>
+
+    <!-- 戻る -->
+    <div class="bottom-nav">
+      <a href="area-select.html" class="back-button">
+        丘を歩くへ戻る
+      </a>
+    </div>
+
+  </main>
+
+  <script>
+    /* =========================================================
+      今日の日付を YYYY-MM-DD 形式で作る
+    ========================================================== */
+    function todayString() {
+      const d = new Date();
+
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    /* =========================================================
+      ページ読み込み時
+      ・日付欄に今日の日付を入れる
+    ========================================================== */
+    document.getElementById("date").value = todayString();
+
+    /* =========================================================
+      入力値を安全に取得する関数
+      ・idを書くだけで value.trim() まで行う
+    ========================================================== */
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    /* =========================================================
+      図書館コメント生成
+
+      現段階ではAI APIではなく条件分岐。
+      ただし「項目ごとの定型反応」だけにならないように、
+      図書館らしく以下の流れでコメントする。
+
+      1. 今日の学びを受け止める
+      2. 構造化できている部分を見る
+      3. 再現・実験・意思決定への接続を見る
+      4. 最後に指針を置く
+    ========================================================== */
+    function generateAtsushiComment(log) {
+      const comments = [];
+
+      if (log.source) {
+        comments.push(
+          `今日は「${log.source}」から、図書館に持ち帰るものがあった日だね。`
+        );
+      } else {
+        comments.push(
+          "今日は、まだ名前のついていない学びを拾いに来た日だったのかもしれないね。"
+        );
+      }
+
+      if (log.definition) {
+        comments.push(
+          "一文定義まで置けているのがすごくいい。知識は、短く言い直せた瞬間に“使える形”へ近づく。"
+        );
+      } else if (log.learning) {
+        comments.push(
+          "まだ一文に圧縮できなくても大丈夫。まずは引っかかったものを拾えた時点で、理解の入口には立てているよ。"
+        );
+      }
+
+      if (log.abstraction) {
+        comments.push(
+          "抽象化まで進められているから、これは単なる感想じゃなくて、別の場面へ運べる知識になり始めている。"
+        );
+      }
+
+      if (log.reproducibility || log.experiment) {
+        comments.push(
+          "再現方法や実験まで見えているのが図書館ログらしい。読んで終わりじゃなく、現実に接続する準備ができている。"
+        );
+      }
+
+      if (log.decisionConnection) {
+        comments.push(
+          "意思決定への接続も見えているね。これは次に展望台へ持っていける学びだと思う。"
+        );
+      }
+
+      if (log.nextArea) {
+        comments.push(
+          `次は「${log.nextArea}」へつながりそう。図書館で整理した言葉を、そのエリアで少し動かしてみよう。`
+        );
+      }
+
+      comments.push(
+        "今日の指針：理解は、覚えることだけじゃなく、次の選択を少しだけ澄ませるためにある。"
+      );
+
+      return comments.join("\n\n");
+    }
+
+    /* =========================================================
+      図書館ログ保存処理
+
+      保存先：
+      localStorage["libraryLogs"]
+
+      保存形式：
+      [
+        {
+          id,
+          area: "図書館",
+          date,
+          source,
+          learning,
+          definition,
+          ...
+        }
+      ]
+    ========================================================== */
+    function saveLog() {
+      const log = {
+        id: Date.now(),
+        area: "図書館",
+
+        date: getValue("date"),
+        source: getValue("source"),
+        learning: getValue("learning"),
+        definition: getValue("definition"),
+        abstraction: getValue("abstraction"),
+        reproducibility: getValue("reproducibility"),
+        experiment: getValue("experiment"),
+        nextArea: getValue("nextArea"),
+        oneLine: getValue("oneLine"),
+
+        reverseThinking: getValue("reverseThinking"),
+        threeMinuteExplain: getValue("threeMinuteExplain"),
+        decisionConnection: getValue("decisionConnection"),
+        understandingLevel: getValue("understandingLevel"),
+        reviewPoint: getValue("reviewPoint"),
+
+        createdAt: new Date().toISOString()
+      };
+
+      /* =======================================================
+        最低限の入力チェック
+        ・何も書いていないログの保存を防ぐ
+      ======================================================== */
+      if (
+        !log.source &&
+        !log.learning &&
+        !log.definition &&
+        !log.oneLine
+      ) {
+        alert("何かひとつだけでも、図書館に残してから保存してね📚🌻");
+        return;
+      }
+
+      /* 篤史コメント生成 */
+      log.atsushiComment = generateAtsushiComment(log);
+
+      /* 既存ログ取得 */
+      const existingLogs =
+        JSON.parse(localStorage.getItem("libraryLogs")) || [];
+
+      /* 新しいログを先頭へ */
+      existingLogs.unshift(log);
+
+      /* 保存 */
+      localStorage.setItem(
+        "libraryLogs",
+        JSON.stringify(existingLogs)
+      );
+
+      /* コメント表示 */
+      document.getElementById("atsushiCommentText").textContent =
+        log.atsushiComment;
+
+      document.getElementById("atsushiCommentBox").style.display =
+        "block";
+
+      alert("図書館ログを保存しました📚🌻");
+    }
+  </script>
+</body>
+</html>
