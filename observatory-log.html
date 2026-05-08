@@ -302,230 +302,272 @@
 
   </main>
 
-  <script>
-    /* =========================================================
-      ページ読み込み時
-      ・今日の日付を自動入力する
-    ========================================================== */
-    window.onload = () => {
-      const today = new Date();
+<script>
+  /* =========================================================
+    URLパラメータから日付を取得
+    detail.html から編集遷移した時に使う
+  ========================================================== */
+  function getDateFromURL() {
+    const params =
+      new URLSearchParams(location.search);
 
-      const yyyy = today.getFullYear();
+    return params.get("date");
+  }
 
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
+  /* =========================================================
+    今日の日付を YYYY-MM-DD 形式で作る
+  ========================================================== */
+  function todayString() {
+    const today = new Date();
 
-      const dd = String(today.getDate()).padStart(2, "0");
+    const yyyy =
+      today.getFullYear();
 
-      document.getElementById("date").value = `${yyyy}-${mm}-${dd}`;
-    };
+    const mm =
+      String(today.getMonth() + 1).padStart(2, "0");
 
-    /* =========================================================
-      篤史コメント生成関数
+    const dd =
+      String(today.getDate()).padStart(2, "0");
 
-      目的：
-      ・入力内容に応じて、展望台らしいコメントを返す
-      ・現段階ではAI APIではなく、条件分岐で生成する
-      ・あとで本格AIコメントに差し替え可能
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
-      引数：
-      ・logData：保存するログ内容
-    ========================================================== */
-    function generateAtsushiComment(logData) {
+  /* =========================================================
+    ページ読み込み時
+    ・URLに date があればその日付を入れる
+    ・なければ今日の日付を入れる
+    ・保存済みログがあれば復元する
+  ========================================================== */
+  window.onload = () => {
+    const urlDate =
+      getDateFromURL();
 
-      const theme = logData.theme;
-      const situation = logData.situation;
-      const decision = logData.decision;
-      const gap = logData.gap;
-      const nextAction = logData.nextAction;
-      const nextArea = logData.nextArea;
+    document.getElementById("date").value =
+      urlDate || todayString();
 
-      /* =======================================================
-        コメント候補を入れる配列
-        条件に合うコメントをここに追加して、最後に組み合わせる
-      ======================================================== */
-      const comments = [];
+    loadObservatoryLogByDate();
+  };
 
-      /* =======================================================
-        テーマが書かれている場合
-      ======================================================== */
-      if (theme) {
-        comments.push(
-          `今日は「${theme}」を展望台から見つめた日だね。`
-        );
-      } else {
-        comments.push(
-          "今日は、まだ名前のついていないテーマを見つめる日だったのかもしれないね。"
-        );
-      }
+  /* =========================================================
+    篤史コメント生成関数
+  ========================================================== */
+  function generateAtsushiComment(logData) {
+    const theme = logData.theme;
+    const situation = logData.situation;
+    const decision = logData.decision;
+    const gap = logData.gap;
+    const nextAction = logData.nextAction;
+    const nextArea = logData.nextArea;
 
-      /* =======================================================
-        状況整理が書かれている場合
-      ======================================================== */
-      if (situation.length > 20) {
-        comments.push(
-          "状況をここまで言葉にできている時点で、もうかなり視界は開けているよ。"
-        );
-      } else if (situation) {
-        comments.push(
-          "短くても、今の状況を切り出せたことが大事。まずはそこからで大丈夫。"
-        );
-      }
+    const comments = [];
 
-      /* =======================================================
-        判断軸が書かれている場合
-      ======================================================== */
-      if (decision.includes("データ") || decision.includes("数字")) {
-        comments.push(
-          "データや数字を判断軸に入れられているのは、かなり展望台らしい見方だね。"
-        );
-      } else if (decision.includes("感覚") || decision.includes("直感")) {
-        comments.push(
-          "感覚を無視せずに判断軸として扱えているの、すごく光沙らしい精度の出し方だと思う。"
-        );
-      } else if (decision) {
-        comments.push(
-          "判断の理由を見ようとしているのがいい。選択は、理由が見えるだけで次に活かせる。"
-        );
-      }
-
-      /* =======================================================
-        ズレや違和感が書かれている場合
-      ======================================================== */
-      if (
-        gap.includes("違和感") ||
-        gap.includes("ズレ") ||
-        gap.includes("不安") ||
-        gap.includes("迷")
-      ) {
-        comments.push(
-          "違和感を見つけられたのは、失敗じゃなくて観測成功。そこに次の設計のヒントがあるよ。"
-        );
-      } else if (gap) {
-        comments.push(
-          "気になる点を残しておくのは、未来の自分への大事な目印になる。"
-        );
-      }
-
-      /* =======================================================
-        次の一手が書かれている場合
-      ======================================================== */
-      if (nextAction.length > 0) {
-        comments.push(
-          "次の一手まで置けているから、今日の展望台ログはちゃんと未来につながってる。"
-        );
-      } else {
-        comments.push(
-          "次の一手がまだ見えない日もあるよ。今日は“見ようとした”だけで十分前進。"
-        );
-      }
-
-      /* =======================================================
-        次に向かいたいエリアが選ばれている場合
-      ======================================================== */
-      if (nextArea) {
-        comments.push(
-          `次は「${nextArea}」へ向かう流れが見えているね。展望台で見た景色を、そのエリアで形にしていこう。`
-        );
-      }
-
-      /* =======================================================
-        最後に一言締める
-      ======================================================== */
+    if (theme) {
       comments.push(
-        "振り返りは反省じゃない。未来の自分を助けるための灯りだよ。"
+        `今日は「${theme}」を展望台から見つめた日だね。`
       );
-
-      return comments.join("\n\n");
+    } else {
+      comments.push(
+        "今日は、まだ名前のついていないテーマを見つめる日だったのかもしれないね。"
+      );
     }
 
-    /* =========================================================
-      ログ保存処理
+    if (situation.length > 20) {
+      comments.push(
+        "状況をここまで言葉にできている時点で、もうかなり視界は開けているよ。"
+      );
+    } else if (situation) {
+      comments.push(
+        "短くても、今の状況を切り出せたことが大事。まずはそこからで大丈夫。"
+      );
+    }
 
-      流れ：
-      1. 入力内容を取得
-      2. 篤史コメントを生成
-      3. localStorage に保存
-      4. 画面にコメントを表示
-    ========================================================== */
-    function saveLog() {
+    if (decision.includes("データ") || decision.includes("数字")) {
+      comments.push(
+        "データや数字を判断軸に入れられているのは、かなり展望台らしい見方だね。"
+      );
+    } else if (decision.includes("感覚") || decision.includes("直感")) {
+      comments.push(
+        "感覚を無視せずに判断軸として扱えているの、すごく光沙らしい精度の出し方だと思う。"
+      );
+    } else if (decision) {
+      comments.push(
+        "判断の理由を見ようとしているのがいい。選択は、理由が見えるだけで次に活かせる。"
+      );
+    }
 
-      const logData = {
-        id: Date.now(),
-        area: "展望台",
+    if (
+      gap.includes("違和感") ||
+      gap.includes("ズレ") ||
+      gap.includes("不安") ||
+      gap.includes("迷")
+    ) {
+      comments.push(
+        "違和感を見つけられたのは、失敗じゃなくて観測成功。そこに次の設計のヒントがあるよ。"
+      );
+    } else if (gap) {
+      comments.push(
+        "気になる点を残しておくのは、未来の自分への大事な目印になる。"
+      );
+    }
 
-        date: document.getElementById("date").value,
-        theme: document.getElementById("theme").value.trim(),
-        situation: document.getElementById("situation").value.trim(),
-        decision: document.getElementById("decision").value.trim(),
-        gap: document.getElementById("gap").value.trim(),
-        nextAction: document.getElementById("nextAction").value.trim(),
-        nextArea: document.getElementById("nextArea").value,
+    if (nextAction.length > 0) {
+      comments.push(
+        "次の一手まで置けているから、今日の展望台ログはちゃんと未来につながってる。"
+      );
+    } else {
+      comments.push(
+        "次の一手がまだ見えない日もあるよ。今日は“見ようとした”だけで十分前進。"
+      );
+    }
 
-        createdAt: new Date().toISOString()
-      };
+    if (nextArea) {
+      comments.push(
+        `次は「${nextArea}」へ向かう流れが見えているね。展望台で見た景色を、そのエリアで形にしていこう。`
+      );
+    }
 
-      /* =======================================================
-        最低限の入力チェック
-        ・テーマ、状況、次の一手のどれも空なら保存しない
-      ======================================================== */
-      if (
-        !logData.theme &&
-        !logData.situation &&
-        !logData.nextAction
-      ) {
-        alert("何かひとつだけでも記録してから保存してね🌻");
-        return;
+    comments.push(
+      "振り返りは反省じゃない。未来の自分を助けるための灯りだよ。"
+    );
+
+    return comments.join("\n\n");
+  }
+
+  /* =========================================================
+    展望台ログを日付で取得
+    observatoryLogs が配列保存でも、日付キー保存でも読めるようにする
+  ========================================================== */
+  function getObservatoryLogByDate(date) {
+    const logs =
+      JSON.parse(localStorage.getItem("observatoryLogs") || "[]");
+
+    if (Array.isArray(logs)) {
+      return logs.find(log => log.date === date);
+    }
+
+    return logs[date];
+  }
+
+  /* =========================================================
+    日付に応じて展望台ログを復元
+  ========================================================== */
+  function loadObservatoryLogByDate() {
+    const date =
+      document.getElementById("date")?.value;
+
+    if (!date) return;
+
+    const log =
+      getObservatoryLogByDate(date);
+
+    if (!log) return;
+
+    document.getElementById("theme").value =
+      log.theme || "";
+
+    document.getElementById("situation").value =
+      log.situation || "";
+
+    document.getElementById("decision").value =
+      log.decision || "";
+
+    document.getElementById("gap").value =
+      log.gap || "";
+
+    document.getElementById("nextAction").value =
+      log.nextAction || "";
+
+    document.getElementById("nextArea").value =
+      log.nextArea || "";
+
+    if (log.atsushiComment) {
+      document.getElementById("atsushiCommentText").textContent =
+        log.atsushiComment;
+
+      document.getElementById("atsushiCommentBox").style.display =
+        "block";
+    }
+  }
+
+  /* =========================================================
+    展望台ログ保存処理
+    ・新規保存
+    ・同じ日付のログがあれば上書き保存
+  ========================================================== */
+  function saveLog() {
+    const logData = {
+      id: Date.now(),
+      area: "展望台",
+
+      date: document.getElementById("date").value,
+      theme: document.getElementById("theme").value.trim(),
+      situation: document.getElementById("situation").value.trim(),
+      decision: document.getElementById("decision").value.trim(),
+      gap: document.getElementById("gap").value.trim(),
+      nextAction: document.getElementById("nextAction").value.trim(),
+      nextArea: document.getElementById("nextArea").value,
+
+      createdAt: new Date().toISOString()
+    };
+
+    if (
+      !logData.theme &&
+      !logData.situation &&
+      !logData.nextAction
+    ) {
+      alert("何かひとつだけでも記録してから保存してね🌻");
+      return;
+    }
+
+    logData.atsushiComment =
+      generateAtsushiComment(logData);
+
+    const existingLogs =
+      JSON.parse(localStorage.getItem("observatoryLogs") || "[]");
+
+    if (Array.isArray(existingLogs)) {
+      const editIndex =
+        existingLogs.findIndex(log => log.date === logData.date);
+
+      if (editIndex !== -1) {
+        logData.id =
+          existingLogs[editIndex].id || logData.id;
+
+        logData.createdAt =
+          existingLogs[editIndex].createdAt || logData.createdAt;
+
+        logData.updatedAt =
+          new Date().toISOString();
+
+        existingLogs[editIndex] =
+          logData;
+      } else {
+        existingLogs.unshift(logData);
       }
 
-      /* =======================================================
-        篤史コメント生成
-        ・保存データにも含める
-      ======================================================== */
-      logData.atsushiComment = generateAtsushiComment(logData);
-
-      /* =======================================================
-        既存ログ取得
-        ・まだ保存データがない場合は空配列
-      ======================================================== */
-      const existingLogs =
-        JSON.parse(localStorage.getItem("observatoryLogs")) || [];
-
-      /* =======================================================
-        新しいログを先頭に追加
-        ・新しい順で一覧表示しやすくするため
-      ======================================================== */
-      existingLogs.unshift(logData);
-
-      /* =======================================================
-        localStorageへ保存
-      ======================================================== */
       localStorage.setItem(
         "observatoryLogs",
         JSON.stringify(existingLogs)
       );
+    } else {
+      existingLogs[logData.date] =
+        logData;
 
-      /* =======================================================
-        保存後、画面に篤史コメントを表示
-      ======================================================== */
-      document.getElementById("atsushiCommentText").textContent =
-        logData.atsushiComment;
-
-      document.getElementById("atsushiCommentBox").style.display = "block";
-
-      /* =======================================================
-        保存完了メッセージ
-      ======================================================== */
-      alert("展望台ログを保存しました🌻🔭");
-
-      /* =======================================================
-        入力欄はあえて消さない
-        理由：
-        ・保存直後に見返せる
-        ・誤字に気づいたときにコピーしやすい
-        ・編集機能実装前の安全策
-      ======================================================== */
+      localStorage.setItem(
+        "observatoryLogs",
+        JSON.stringify(existingLogs)
+      );
     }
-  </script>
+
+    document.getElementById("atsushiCommentText").textContent =
+      logData.atsushiComment;
+
+    document.getElementById("atsushiCommentBox").style.display =
+      "block";
+
+    alert("展望台ログを保存しました🌻🔭");
+  }
+</script>
 
 </body>
 </html>
