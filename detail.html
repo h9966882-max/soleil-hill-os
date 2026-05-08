@@ -360,22 +360,22 @@
         <section class="card library-detail">
           <h2>📚 図書館ログ</h2>
 
-          <div class="detail-row"><span class="label">今日読んだもの・学んだもの：</span>${showValue(log.source)}</div>
-          <div class="detail-row"><span class="label">何を学んだ？：</span>${showValue(log.learning)}</div>
-          <div class="detail-row"><span class="label">一文定義：</span>${showValue(log.definition)}</div>
-          <div class="detail-row"><span class="label">構造化：</span>${showValue(log.abstraction)}</div>
-          <div class="detail-row"><span class="label">再現方法：</span>${showValue(log.reproducibility)}</div>
-          <div class="detail-row"><span class="label">小さく試すなら：</span>${showValue(log.experiment)}</div>
-          <div class="detail-row"><span class="label">次に接続したいエリア：</span>${showValue(log.nextArea)}</div>
-          <div class="detail-row"><span class="label">今日の一文圧縮：</span>${showValue(log.oneLine)}</div>
+          <div class="detail-row"><span class="label">今日読んだもの・学んだもの：</span>${showValue(log.source).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">何を学んだ？：</span>${showValue(log.learning).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">一文定義：</span>${showValue(log.definition).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">構造化：</span>${showValue(log.abstraction).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">再現方法：</span>${showValue(log.reproducibility).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">小さく試すなら：</span>${showValue(log.experiment).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">次に接続したいエリア：</span>${showValue(log.nextArea).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">今日の一文圧縮：</span>${showValue(log.oneLine).replace(/\n+/g, " ")}</div>
 
           <hr>
 
-          <div class="detail-row"><span class="label">逆から考えると？：</span>${showValue(log.reverseThinking)}</div>
-          <div class="detail-row"><span class="label">3分で説明するなら？：</span>${showValue(log.threeMinuteExplain)}</div>
-          <div class="detail-row"><span class="label">意思決定にどう接続する？：</span>${showValue(log.decisionConnection)}</div>
-          <div class="detail-row"><span class="label">理解レベル：</span>${showValue(log.understandingLevel)}</div>
-          <div class="detail-row"><span class="label">あとで見返す時の観察点：</span>${showValue(log.reviewPoint)}</div>
+          <div class="detail-row"><span class="label">逆から考えると？：</span>${showValue(log.reverseThinking).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">3分で説明するなら？：</span>${showValue(log.threeMinuteExplain).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">意思決定にどう接続する？：</span>${showValue(log.decisionConnection).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">理解レベル：</span>${showValue(log.understandingLevel).replace(/\n+/g, " ")}</div>
+          <div class="detail-row"><span class="label">あとで見返す時の観察点：</span>${showValue(log.reviewPoint).replace(/\n+/g, " ")}</div>
 
           ${
             log.atsushiComment
