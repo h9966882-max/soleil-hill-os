@@ -382,19 +382,24 @@
       const morningLogs = readStorage("soleilMorningLogs");
       const nightLogs = readStorage("soleilLogs");
       const areaLogs = readStorage("soleilAreaLogs");
-      const observatoryLogs = readStorage("observatoryLogs");
+      const observatoryLogs =
+  JSON.parse(localStorage.getItem("observatoryLogs") || "[]");
       const libraryLogs = readArrayStorage("libraryLogs");
 
       renderMorningLog(date, morningLogs[date]);
       renderNightLog(date, nightLogs[date]);
-      renderObservatoryLog(date, observatoryLogs[date]);
+      const observatoryLog = Array.isArray(observatoryLogs)
+  ? observatoryLogs.find(log => log.date === date)
+  : observatoryLogs[date];
+
+renderObservatoryLog(date, observatoryLog);
       renderLibraryLogs(date, libraryLogs);
       renderAreaLogs(date, areaLogs[date]);
 
       const hasAnyLog =
         morningLogs[date] ||
         nightLogs[date] ||
-        observatoryLogs[date] ||
+        observatoryLog ||
         libraryLogs.some(log => log.date === date) ||
         areaLogs[date];
 
