@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <title>ソレイユ日誌｜週次ログ一覧</title>
+
+  <style>
+    /* ==================================================
+       🌻 色の設定
+    ================================================== */
+    :root {
+      --paper: #fff9ea;
+      --ink: #4a3422;
+      --gold: #b99a55;
+      --green: #768b4b;
+      --soft: rgba(255, 249, 234, 0.9);
+    }
+
+    /* ==================================================
+       📖 ページ全体
+    ================================================== */
+    body {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(255, 220, 120, .35), transparent 30%),
+        linear-gradient(#fff8e8, #f7efd8);
+    }
+
+    .screen {
+      min-height: 100vh;
+      padding: 28px 18px 80px;
+      box-sizing: border-box;
+    }
+
+    /* ==================================================
+       🌻 ヘッダー
+    ================================================== */
+    .header {
+      text-align: center;
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      padding: 22px 12px;
+      background: var(--soft);
+      margin-bottom: 18px;
+    }
+
+    .small {
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      margin: 6px 0;
+      font-size: 34px;
+      letter-spacing: .08em;
+      line-height: 1.4;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       📜 カード共通
+    ================================================== */
+    .card {
+      background: var(--soft);
+      border: 1px solid #d9c38b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
+      text-align: left;
+    }
+
+    /* ==================================================
+       📅 週次ログカード
+    ================================================== */
+    .weekly-item {
+      background: rgba(255, 255, 255, .68);
+      border: 1px solid #d9c38b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .weekly-range {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .weekly-title {
+      font-size: 18px;
+      line-height: 1.7;
+      margin: 8px 0 12px;
+    }
+
+    .weekly-meta {
+      color: var(--green);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    /* ==================================================
+       🏷️ 週次タグ
+    ================================================== */
+    .weekly-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .weekly-tag {
+      display: inline-block;
+      border: 1px solid #d9c38b;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255, 255, 255, .75);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* ==================================================
+       🌿 補足メッセージ
+    ================================================== */
+    .notice {
+      color: var(--green);
+      line-height: 1.8;
+    }
+
+    .empty {
+      text-align: center;
+    }
+
+    /* ==================================================
+       🔘 ボタン共通
+    ================================================== */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      background: #fffaf0;
+      color: var(--ink);
+      font-size: 18px;
+      font-family: inherit;
+      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    .primary-button {
+      background: #f6e8bd;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="screen">
+
+    <!-- ==================================================
+       🌻 ヘッダー
+    ================================================== -->
+    <div class="header">
+      <div class="small">Soleil Hill Weekly Archive</div>
+      <h1>週次ログ一覧</h1>
+      <p>一週間ごとの振り返りを、静かに読み返す</p>
+    </div>
+
+    <!-- ==================================================
+       📖 週次ログ一覧
+       JavaScriptで保存済み週次ログを表示する
+    ================================================== -->
+    <div id="weeklyArchiveList"></div>
+
+    <!-- ==================================================
+       🔘 操作ボタン
+    ================================================== -->
+    <button class="primary-button" onclick="location.href='weekly.html'">
+      新しい週次ログを書く
+    </button>
+
+    <button onclick="location.href='index.html'">
+      丘の入口へ戻る
+    </button>
+
+  </section>
+
+  <script>
+    /* ==================================================
+       📦 localStorageから安全にデータを読む関数
+    ================================================== */
+    function readStorage(key) {
+      return JSON.parse(
+        localStorage.getItem(key) || "{}"
+      );
+    }
+
+    /* ==================================================
+       📖 週次ログ一覧を取得する関数
+       weekly.html が保存する soleilWeeklyLogs を読む
+    ================================================== */
+    function getWeeklyLogs() {
+      return readStorage("soleilWeeklyLogs");
+    }
+
+    /* ==================================================
+       📅 日付表示を整える関数
+       2026-05-03 → 2026/05/03
+    ================================================== */
+    function formatDate(dateText) {
+      if (!dateText) return "未設定";
+      return dateText.replaceAll("-", "/");
+    }
+
+    /* ==================================================
+       📝 一覧に出すタイトルを決める関数
+       一言まとめ → ハイライト → フォーカス の順で探す
+    ================================================== */
+    function getWeeklyTitle(log) {
+      if (log.oneLine) return log.oneLine;
+      if (log.highlight) return log.highlight;
+      if (log.focus) return `来週のフォーカス：${log.focus}`;
+
+      return "名前のない週次ログ";
+    }
+
+    /* ==================================================
+       🏷️ 週次ログタグを作る関数
+    ================================================== */
+    function buildWeeklyTags(log) {
+      const tags = [];
+
+      if (log.highlight) {
+        tags.push(`<span class="weekly-tag">🌟 ハイライトあり</span>`);
+      }
+
+      if (log.areaNotice || log.areaAction) {
+        tags.push(`<span class="weekly-tag">🗺️ エリア振り返り</span>`);
+      }
+
+      if (log.routineKept || log.routineImprove) {
+        tags.push(`<span class="weekly-tag">🌿 習慣レビュー</span>`);
+      }
+
+      if (log.focus) {
+        tags.push(`<span class="weekly-tag">🔭 来週フォーカス</span>`);
+      }
+
+      if (log.pattern) {
+        tags.push(`<span class="weekly-tag">🧭 パターン観測</span>`);
+      }
+
+      if (!tags.length) {
+        tags.push(`<span class="weekly-tag">📖 週次ログ</span>`);
+      }
+
+      return tags.join("");
+    }
+
+    /* ==================================================
+       📅 保存日時を表示する関数
+    ================================================== */
+    function formatSavedAt(savedAt) {
+      if (!savedAt) return "保存日時：未記録";
+
+      const d = new Date(savedAt);
+
+      if (isNaN(d.getTime())) {
+        return "保存日時：未記録";
+      }
+
+      return `保存日時：${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    /* ==================================================
+       📜 週次ログカードを作る関数
+    ================================================== */
+    function buildWeeklyItem(log) {
+      const title =
+        getWeeklyTitle(log);
+
+      const tags =
+        buildWeeklyTags(log);
+
+      return `
+        <div class="weekly-item" onclick="openWeeklyLog('${log.start}', '${log.end}')">
+          <div class="weekly-range">
+            ${formatDate(log.start)} 〜 ${formatDate(log.end)}
+          </div>
+
+          <div class="weekly-title">
+            ${title}
+          </div>
+
+          <div class="weekly-meta">
+            ${formatSavedAt(log.savedAt)}
+          </div>
+
+          <div class="weekly-tags">
+            ${tags}
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==================================================
+       📖 週次ログ一覧を描画する関数
+    ================================================== */
+    function renderWeeklyArchive() {
+      const weeklyLogs =
+        getWeeklyLogs();
+
+      const list =
+        document.getElementById("weeklyArchiveList");
+
+      if (!list) return;
+
+      const logs =
+        Object.values(weeklyLogs)
+          .filter(log => log.start && log.end)
+          .sort((a, b) => b.start.localeCompare(a.start));
+
+      if (!logs.length) {
+        list.innerHTML = `
+          <div class="card notice empty">
+            🌻 まだ週次ログはありません。<br>
+            まずは一週間の記録を書いてみよう。
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML =
+        logs.map(log => buildWeeklyItem(log)).join("");
+    }
+
+    /* ==================================================
+       🔎 週次ログ編集ページへ移動する関数
+       weekly.html に start/end を渡して読み込ませる
+    ================================================== */
+    function openWeeklyLog(start, end) {
+      location.href =
+        `weekly.html?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+    }
+
+    /* ==================================================
+       🌻 ページ読み込み時の初期処理
+    ================================================== */
+    renderWeeklyArchive();
+  </script>
+
+</body>
+
+</html>
