@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- =========================================================
+    ソレイユの丘 Webアプリ
+    detail.html
+
+    役割：
+    ・選択した日付のログ詳細を表示するページ
+    ・朝ログ / 夜ログ / エリアログ / 展望台ログをまとめて表示する
+
+    読み込む保存先：
+    ・localStorage["soleilMorningLogs"]  朝ログ
+    ・localStorage["soleilLogs"]         夜ログ
+    ・localStorage["soleilAreaLogs"]     既存エリアログ
+    ・localStorage["observatoryLogs"]    展望台ログ
+
+    URL例：
+    detail.html?date=2026-05-07
+  ========================================================== -->
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ログ詳細｜ソレイユの丘</title>
+
+  <style>
+    /* =========================================================
+      全体設定
+    ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 16px;
+      min-height: 100vh;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: #4b3524;
+
+      background:
+        linear-gradient(
+          rgba(255, 248, 224, 0.9),
+          rgba(255, 238, 196, 0.94)
+        ),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+      ページ上部
+    ========================================================== */
+    .hero {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 24px 18px;
+      border-radius: 28px;
+      background: rgba(255, 252, 242, 0.9);
+      border: 1px solid rgba(180, 130, 70, 0.25);
+      box-shadow: 0 10px 28px rgba(90, 60, 20, 0.12);
+    }
+
+    .hero-sub {
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      color: #9a6b2f;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .date-title {
+      margin-top: 10px;
+      color: #7a5a2c;
+      font-size: 0.95rem;
+    }
+
+    /* =========================================================
+      共通カード
+    ========================================================== */
+    .card {
+      margin-bottom: 16px;
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255, 252, 240, 0.93);
+      border: 1px solid rgba(178, 139, 77, 0.32);
+      box-shadow: 0 8px 24px rgba(90, 60, 20, 0.1);
+      line-height: 1.8;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      color: #6f8a50;
+      font-size: 1.25rem;
+    }
+
+    .detail-row {
+      margin-bottom: 8px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #6f8a50;
+    }
+
+    .empty {
+      text-align: center;
+      color: #6f8a50;
+      padding: 18px;
+    }
+
+    /* =========================================================
+      接続エリア用の小さなタグ
+    ========================================================== */
+    .area-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .area-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(160, 130, 70, 0.35);
+      background: rgba(255, 250, 230, 0.8);
+      font-size: 0.8rem;
+    }
+
+    /* =========================================================
+      篤史コメント
+    ========================================================== */
+    .atsushi-comment {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255, 245, 196, 0.78);
+      border: 1px solid rgba(210, 170, 80, 0.35);
+      white-space: pre-line;
+      line-height: 1.8;
+    }
+
+    /* =========================================================
+      ボタン
+    ========================================================== */
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 15px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(255, 252, 240, 0.95);
+      color: #4b3524;
+      font-family: inherit;
+      font-size: 1rem;
+      box-shadow: 0 6px 18px rgba(90, 60, 20, 0.12);
+    }
+
+    .edit-button {
+      background: #f5e4ad;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 18px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- =========================================================
+      ページタイトル
+    ========================================================== -->
+    <section class="hero">
+      <div class="hero-sub">SOLEIL DAILY DETAIL</div>
+      <h1>丘の記録詳細</h1>
+      <div id="dateTitle" class="date-title"></div>
+    </section>
+
+    <!-- =========================================================
+      朝ログ表示エリア
+    ========================================================== -->
+    <div id="morningDetail"></div>
+
+    <!-- =========================================================
+      夜ログ表示エリア
+    ========================================================== -->
+    <div id="nightDetail"></div>
+
+    <!-- =========================================================
+      既存エリアログ表示エリア
+      ※ これは消さない
+    ========================================================== -->
+    <div id="areaDetail"></div>
+
+    <!-- =========================================================
+      展望台ログ表示エリア
+      ※ observatory-log.html で保存したログをここに出す
+    ========================================================== -->
+    <div id="observatoryLogSection"></div>
+		
+		<!-- =========================================================
+  📚 図書館ログ表示エリア
+  library-log.html で保存したログをここに表示する
+========================================================= -->
+<div id="libraryLogSection"></div>
+
+
+    <!-- =========================================================
+      戻るボタン
+    ========================================================== -->
+    <button onclick="location.href='archive.html'">
+      記録書庫へ戻る
+    </button>
+
+    <button onclick="location.href='index.html'">
+      丘の入口へ戻る
+    </button>
+
+  </main>
+
+  <script>
+    /* =========================================================
+      localStorageを安全に読む関数
+
+      データがない場合：
+      → 空オブジェクト {} を返す
+
+      JSONが壊れている場合：
+      → エラーを避けて空オブジェクトを返す
+    ========================================================== */
+    function readStorage(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || {};
+      } catch (error) {
+        console.error(`${key} の読み込みに失敗しました`, error);
+        return {};
+      }
+    }
+
+    /* =========================================================
+      未記録対策
+
+      値が空なら「未記録」と表示する
+    ========================================================== */
+    function showValue(value) {
+      if (
+        value === undefined ||
+        value === null ||
+        value === ""
+      ) {
+        return "未記録";
+      }
+
+      return value;
+    }
+
+    /* =========================================================
+      配列・文字列どちらでもエリアタグ表示できるようにする
+    ========================================================== */
+    function renderAreaTags(areas) {
+      if (!areas || areas.length === 0) {
+        return "未記録";
+      }
+
+      const areaArray = Array.isArray(areas) ? areas : [areas];
+
+      return `
+        <div class="area-tags">
+          ${areaArray.map(area => `
+            <span class="area-tag">${area}</span>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    /* =========================================================
+      URLから日付を取得する
+
+      例：
+      detail.html?date=2026-05-07
+    ========================================================== */
+    function getDateFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("date");
+    }
+
+    /* =========================================================
+      朝ログ表示
+    ========================================================== */
+    function renderMorningLog(date, morning) {
+      const box = document.getElementById("morningDetail");
+
+      if (!morning) {
+        box.innerHTML = `
+          <div class="card empty">
+            🌅 この日の朝ログはありません。
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="card">
+          <h2>🌅 朝ログ</h2>
+
+          <div class="detail-row">
+            <span class="label">今日のテーマ：</span>
+            ${showValue(morning.theme)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">今朝の気分：</span>
+            ${showValue(morning.mood)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">1ミリ行動：</span>
+            ${showValue(morning.action)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">行きたいエリア：</span>
+            ${renderAreaTags(morning.areas)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">注意点：</span>
+            ${showValue(morning.notice)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">朝の一文：</span>
+            ${showValue(morning.oneLine)}
+          </div>
+
+          <button
+            class="edit-button"
+            onclick="location.href='morninglog.html?date=${date}'">
+            朝ログを編集する
+          </button>
+        </div>
+      `;
+    }
+
+    /* =========================================================
+  🌙 夜ログ表示
+  log.html の保存形式に合わせた完全修正版
+========================================================= */
+function renderNightLog(date, night) {
+
+  const box =
+    document.getElementById("nightDetail");
+
+  /* ------------------------------------------------------
+    ログが存在しない場合
+  ------------------------------------------------------ */
+  if (!night) {
+
+    box.innerHTML = `
+      <div class="card empty">
+        🌙 この日の夜ログはありません。
+      </div>
+    `;
+
+    return;
+  }
+
+  /* ------------------------------------------------------
+    夜ログ表示
+  ------------------------------------------------------ */
+  box.innerHTML = `
+    <div class="card">
+
+      <h2>🌙 夜ログ</h2>
+
+      <!-- 今日のテーマ -->
+      <div class="detail-row">
+        <span class="label">今日のテーマ：</span>
+        ${showValue(night.theme)}
+      </div>
+
+      <!-- 主感情 -->
+      <div class="detail-row">
+        <span class="label">主感情：</span>
+        ${showValue(night.mood)}
+      </div>
+
+      <!-- エネルギー -->
+      <div class="detail-row">
+        <span class="label">エネルギー：</span>
+        ${showValue(night.energy)}
+      </div>
+
+      <!-- 今日やったこと -->
+      <div class="detail-row">
+        <span class="label">今日やったこと：</span>
+        ${showValue(night.done)}
+      </div>
+
+      <!-- 心が動いたこと -->
+      <div class="detail-row">
+        <span class="label">心が動いたこと：</span>
+        ${showValue(night.heart)}
+      </div>
+
+      <!-- 制作ログ -->
+      <div class="detail-row">
+        <span class="label">制作ログ：</span>
+        ${showValue(night.create)}
+      </div>
+
+      <!-- 思考ログ -->
+      <div class="detail-row">
+        <span class="label">思考ログ：</span>
+        ${showValue(night.think)}
+      </div>
+
+      <!-- 接続エリア -->
+      <div class="detail-row">
+        <span class="label">接続エリア：</span>
+        ${renderAreaTags(night.areas)}
+      </div>
+
+      <!-- 明日に残すこと -->
+      <div class="detail-row">
+        <span class="label">明日に残すこと：</span>
+        ${showValue(night.tomorrow)}
+      </div>
+
+      <!-- 今日の一文 -->
+      <div class="detail-row">
+        <span class="label">今日の一文：</span>
+        ${showValue(night.oneLine)}
+      </div>
+
+      <hr>
+
+      <!-- 何が起きた？ -->
+      <div class="detail-row">
+        <span class="label">何が起きた？：</span>
+        ${showValue(night.trigger)}
+      </div>
+
+      <!-- どう解釈した？ -->
+      <div class="detail-row">
+        <span class="label">どう解釈した？：</span>
+        ${showValue(night.interpret)}
+      </div>
+
+      <!-- 感情の意味 -->
+      <div class="detail-row">
+        <span class="label">この感情は何を伝えている？：</span>
+        ${showValue(night.meaning)}
+      </div>
+
+      <!-- 最適行動 -->
+      <div class="detail-row">
+        <span class="label">今とる最適行動：</span>
+        ${showValue(night.action)}
+      </div>
+
+      <!-- やらない行動 -->
+      <div class="detail-row">
+        <span class="label">やらない行動：</span>
+        ${showValue(night.avoid)}
+      </div>
+
+      <!-- 編集ボタン -->
+      <button
+        class="edit-button"
+        onclick="location.href='log.html?date=${date}'">
+
+        夜ログを編集する
+
+      </button>
+
+    </div>
+  `;
+}
+    
+
+    /* =========================================================
+      既存エリアログ表示
+
+      現在の想定：
+      localStorage["soleilAreaLogs"] に
+      日付ごとのエリアログが入る予定
+
+      まだデータがない場合：
+      「この日のエリアログはありません。」を表示
+    ========================================================== */
+    function renderAreaLogs(date, areaLogsForDate) {
+      const box = document.getElementById("areaDetail");
+
+      if (
+        !areaLogsForDate ||
+        Object.keys(areaLogsForDate).length === 0
+      ) {
+				box.innerHTML = "";
+return;
+      }
+
+      box.innerHTML = Object.keys(areaLogsForDate).map(areaName => {
+        const log = areaLogsForDate[areaName];
+
+        return `
+          <div class="card">
+            <h2>🗺️ ${areaName}ログ</h2>
+
+            <div class="detail-row">
+              <span class="label">テーマ：</span>
+              ${showValue(log.theme)}
+            </div>
+
+            <div class="detail-row">
+              <span class="label">気づき：</span>
+              ${showValue(log.notice)}
+            </div>
+
+            <div class="detail-row">
+              <span class="label">行動：</span>
+              ${showValue(log.action)}
+            </div>
+
+            <div class="detail-row">
+              <span class="label">一言まとめ：</span>
+              ${showValue(log.oneLine)}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    /* =========================================================
+      🔭展望台ログ表示
+
+      保存元：
+      localStorage["observatoryLogs"]
+
+      保存形式：
+      [
+        {
+          date: "2026-05-07",
+          theme: "...",
+          situation: "...",
+          decision: "...",
+          gap: "...",
+          nextAction: "...",
+          nextArea: "...",
+          atsushiComment: "..."
+        }
+      ]
+
+      ポイント：
+      ・observatoryLogs は「配列」
+      ・date が一致するものだけ表示する
+      ・1日に複数件あっても全部表示できる
+    ========================================================== */
+    function renderObservatoryLogs(date) {
+      const box = document.getElementById("observatoryLogSection");
+
+      const observatoryLogs =
+        JSON.parse(localStorage.getItem("observatoryLogs")) || [];
+
+      const sameDateLogs =
+        observatoryLogs.filter(log => log.date === date);
+
+      if (sameDateLogs.length === 0) {
+        box.innerHTML = `
+          <div class="card empty">
+            🔭 この日の展望台ログはありません。
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = sameDateLogs.map(log => `
+        <div class="card">
+          <h2>🔭 展望台ログ</h2>
+
+          <div class="detail-row">
+            <span class="label">今日向き合ったテーマ：</span>
+            ${showValue(log.theme)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">今、どんな状況？：</span>
+            ${showValue(log.situation)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">何を基準に判断した？：</span>
+            ${showValue(log.decision)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">違和感やズレ：</span>
+            ${showValue(log.gap)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">次に進めたいこと：</span>
+            ${showValue(log.nextAction)}
+          </div>
+
+          <div class="detail-row">
+            <span class="label">次に向かいたいエリア：</span>
+            ${showValue(log.nextArea)}
+          </div>
+
+          ${
+            log.atsushiComment
+              ? `
+                <div class="atsushi-comment">
+                  <strong>篤史からの展望コメント 🔭</strong><br><br>
+                  ${log.atsushiComment}
+                </div>
+              `
+              : ""
+          }
+        </div>
+      `).join("");
+    }
+		
+		
+		/* =========================================================
+  📚 図書館ログ表示
+
+  保存元：
+  localStorage["libraryLogs"]
+
+  役割：
+  ・library-log.html で保存した図書館ログを表示する
+  ・日付が一致するログだけ表示する
+  ・1日に複数件あっても全部表示する
+========================================================= */
+function renderLibraryLogs(date) {
+  const box = document.getElementById("libraryLogSection");
+
+  if (!box) return;
+
+  const libraryLogs =
+    JSON.parse(localStorage.getItem("libraryLogs")) || [];
+
+  const sameDateLogs =
+    libraryLogs.filter(log => log.date === date);
+
+  if (sameDateLogs.length === 0) {
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = sameDateLogs.map(log => `
+    <div class="card">
+      <h2>📚 図書館ログ</h2>
+
+      <div class="detail-row">
+        <span class="label">今日読んだもの・学んだもの：</span>
+        ${showValue(log.source)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">何を学んだ？：</span>
+        ${showValue(log.learning)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">一文定義：</span>
+        ${showValue(log.definition)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">構造化：</span>
+        ${showValue(log.abstraction)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">再現方法：</span>
+        ${showValue(log.reproducibility)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">小さく試すなら：</span>
+        ${showValue(log.experiment)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">次に接続したいエリア：</span>
+        ${showValue(log.nextArea)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">今日の一文圧縮：</span>
+        ${showValue(log.oneLine)}
+      </div>
+
+      <hr>
+
+      <div class="detail-row">
+        <span class="label">逆から考えると？：</span>
+        ${showValue(log.reverseThinking)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">3分で説明するなら？：</span>
+        ${showValue(log.threeMinuteExplain)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">意思決定にどう接続する？：</span>
+        ${showValue(log.decisionConnection)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">理解レベル：</span>
+        ${showValue(log.understandingLevel)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">あとで見返す時の観察点：</span>
+        ${showValue(log.reviewPoint)}
+      </div>
+
+      ${
+        log.atsushiComment
+          ? `
+            <div class="atsushi-comment">
+              <strong>篤史からの図書館コメント 📚</strong><br><br>
+              ${log.atsushiComment}
+            </div>
+          `
+          : ""
+      }
+    </div>
+  `).join("");
+}
+
+
+
+    /* =========================================================
+      篤史総括コメント生成
+
+      朝ログ・夜ログ・既存エリアログの有無から
+      簡単なコメントを作る
+    ========================================================== */
+    function generateAtsushiComment(date, morning, night, areaLogsForDate) {
+      const hasMorning = !!morning;
+      const hasNight = !!night;
+      const hasArea =
+        areaLogsForDate &&
+        Object.keys(areaLogsForDate).length > 0;
+
+      if (hasMorning && hasNight && hasArea) {
+        return "朝・夜・エリアログまで揃っていて、今日の丘の動きがかなり立体的に残っているよ。";
+      }
+
+      if (hasMorning && hasNight) {
+        return "朝と夜の記録があるから、今日の始まりと終わりの流れが見えているよ。";
+      }
+
+      if (hasMorning) {
+        return "朝の時点で意識を向けられているのがいいね。小さな方針が一日を支えてくれる。";
+      }
+
+      if (hasNight) {
+        return "夜に振り返れたこと自体が、今日をちゃんと受け取った証拠だよ。";
+      }
+
+      return "この日はまだ記録が少ないけれど、空白もまた丘の一部。次に書く日への余白だね。";
+    }
+
+    /* =========================================================
+      ページ全体を描画するメイン関数
+
+      流れ：
+      1. URLから日付取得
+      2. localStorageから各ログ取得
+      3. 日付に一致するログを取り出す
+      4. 各表示関数を実行
+    ========================================================== */
+    function renderDetailPage() {
+      const date = getDateFromUrl();
+
+      if (!date) {
+        document.getElementById("dateTitle").innerText =
+          "日付が指定されていません";
+        return;
+      }
+
+      document.getElementById("dateTitle").innerText =
+        `${date} の記録`;
+
+      const morningLogs = readStorage("soleilMorningLogs");
+      const nightLogs = readStorage("soleilLogs");
+      const areaLogs = readStorage("soleilAreaLogs");
+
+      const morning = morningLogs[date];
+      const night = nightLogs[date];
+      const areaLogsForDate = areaLogs[date];
+
+      renderMorningLog(date, morning);
+      renderNightLog(date, night);
+      renderAreaLogs(date, areaLogsForDate);
+      renderObservatoryLogs(date);
+			renderLibraryLogs(date);
+    }
+
+    /* =========================================================
+      ページ読み込み時に実行
+    ========================================================== */
+    renderDetailPage();
+  </script>
+</body>
+</html>
