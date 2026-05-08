@@ -99,28 +99,60 @@
       white-space: pre-wrap;
     }
 
-    button,
-    .edit-button {
-      display: block;
-      width: 100%;
-      margin-top: 16px;
-      padding: 14px;
-      border: none;
-      border-radius: 999px;
-      background: #f5e4ad;
-      color: #4b3524;
-      font-family: inherit;
-      font-size: 1rem;
-      text-align: center;
-      text-decoration: none;
-      box-shadow: 0 6px 16px rgba(80, 60, 30, 0.12);
-    }
+    button {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  border: none;
+  border-radius: 999px;
+  background: #f5e4ad;
+  color: #4b3524;
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(80, 60, 30, 0.08);
+}
+
+/* =========================================================
+  ✏️ 編集ボタン専用
+========================================================= */
+
+.edit-button {
+  display: inline-block;
+  width: auto;
+  margin-top: 14px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #f5e4ad;
+  color: #4b3524;
+  font-size: 0.92rem;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(80, 60, 30, 0.08);
+}
 
     hr {
       border: none;
       border-top: 1px solid rgba(120, 100, 70, 0.3);
       margin: 16px 0;
     }
+    
+    /* =========================================================
+  📚 図書館ログの表示間隔を整える
+  入力欄由来の余白・改行が大きく見えすぎるのを防ぐ
+========================================================= */
+
+.library-detail .detail-row {
+  margin: 8px 0;
+  line-height: 1.65;
+}
+
+.library-detail {
+  padding-bottom: 20px;
+}
+    
   </style>
 </head>
 
@@ -311,7 +343,7 @@
       }
 
       box.innerHTML = sameDateLogs.map(log => `
-        <section class="card">
+        <section class="card library-detail">
           <h2>📚 図書館ログ</h2>
 
           <div class="detail-row"><span class="label">今日読んだもの・学んだもの：</span>${showValue(log.source)}</div>
