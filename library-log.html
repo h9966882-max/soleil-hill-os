@@ -471,6 +471,16 @@
   </main>
 
   <script>
+  /* =========================================================
+  📅 URLパラメータから日付を取得
+  detail.html から編集遷移した時に使う
+========================================================= */
+function getDateFromURL() {
+  const params = new URLSearchParams(location.search);
+
+  return params.get("date");
+}
+
     /* =========================================================
       今日の日付を YYYY-MM-DD 形式で作る
     ========================================================== */
@@ -484,7 +494,12 @@
       ページ読み込み時
       ・日付欄に今日の日付を入れる
     ========================================================== */
-    document.getElementById("date").value = todayString();
+    const urlDate = getDateFromURL();
+
+document.getElementById("date").value =
+  urlDate || todayString();
+  
+loadLibraryLogByDate();
 
     /* =========================================================
       入力値を安全に取得する関数
@@ -560,6 +575,63 @@
       return comments.join("\n\n");
     }
 
+/* =========================================================
+  📚 日付に応じて図書館ログを復元
+========================================================= */
+function loadLibraryLogByDate() {
+  const date =
+    document.getElementById("date")?.value;
+
+  if (!date) return;
+
+  const logs =
+    JSON.parse(localStorage.getItem("libraryLogs") || "[]");
+
+  const log =
+    logs.find(l => l.date === date);
+
+  if (!log) return;
+
+  document.getElementById("source").value =
+    log.source || "";
+
+  document.getElementById("learning").value =
+    log.learning || "";
+
+  document.getElementById("definition").value =
+    log.definition || "";
+
+  document.getElementById("abstraction").value =
+    log.abstraction || "";
+
+  document.getElementById("reproducibility").value =
+    log.reproducibility || "";
+
+  document.getElementById("experiment").value =
+    log.experiment || "";
+
+  document.getElementById("nextArea").value =
+    log.nextArea || "";
+
+  document.getElementById("oneLine").value =
+    log.oneLine || "";
+
+  document.getElementById("reverseThinking").value =
+    log.reverseThinking || "";
+
+  document.getElementById("threeMinuteExplain").value =
+    log.threeMinuteExplain || "";
+
+  document.getElementById("decisionConnection").value =
+    log.decisionConnection || "";
+
+  document.getElementById("understandingLevel").value =
+    log.understandingLevel || "";
+
+  document.getElementById("reviewPoint").value =
+    log.reviewPoint || "";
+}
+
     /* =========================================================
       図書館ログ保存処理
 
@@ -622,10 +694,25 @@
 
       /* 既存ログ取得 */
       const existingLogs =
-        JSON.parse(localStorage.getItem("libraryLogs")) || [];
+  JSON.parse(localStorage.getItem("libraryLogs")) || [];
 
-      /* 新しいログを先頭へ */
-      existingLogs.unshift(log);
+const editId =
+  new URLSearchParams(location.search).get("id");
+
+if (editId) {
+  const index = existingLogs.findIndex(
+    item => String(item.id) === editId
+  );
+
+  if (index !== -1) {
+    log.id = Number(editId);
+    existingLogs[index] = log;
+  } else {
+    existingLogs.unshift(log);
+  }
+} else {
+  existingLogs.unshift(log);
+}
 
       /* 保存 */
       localStorage.setItem(
