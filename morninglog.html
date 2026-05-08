@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <title>ソレイユ日誌｜朝ログ</title>
+
+  <style>
+    /* ==================================================
+       🌻 色の設定
+    ================================================== */
+    :root {
+      --paper: #fff9ea;
+      --ink: #4a3422;
+      --gold: #b99a55;
+      --green: #768b4b;
+      --soft: rgba(255, 249, 234, 0.9);
+    }
+
+    /* ==================================================
+       🌅 ページ全体
+    ================================================== */
+    body {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.75), transparent 35%),
+        linear-gradient(#ffd9a3, #fff4c9);
+    }
+
+    /* ==================================================
+       🌅 朝ログ画面全体
+    ================================================== */
+    .screen {
+      min-height: 100vh;
+      padding: 28px 18px 130px;
+      box-sizing: border-box;
+    }
+
+    /* ==================================================
+       🌻 ヘッダー
+    ================================================== */
+    .header {
+      text-align: center;
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      padding: 22px 12px;
+      background: var(--soft);
+      margin-bottom: 18px;
+    }
+
+    .small {
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      margin: 6px 0;
+      font-size: 34px;
+      letter-spacing: .08em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       📜 入力カード
+    ================================================== */
+    .card {
+      background: var(--soft);
+      border: 1px solid #d9c38b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      color: var(--green);
+    }
+
+    /* ==================================================
+       🏷️ ラベル
+    ================================================== */
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-size: 14px;
+    }
+
+    /* ==================================================
+       ✏️ 入力欄
+    ================================================== */
+    input,
+    textarea,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6c59b;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .72);
+      padding: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    /* ==================================================
+       📅 日付入力欄
+       スマホで崩れにくくする設定
+    ================================================== */
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* ==================================================
+       🌻 ミニキャラ篤史エリア
+    ================================================== */
+    .atsushi-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #fffdf7;
+      border: 1px solid #d8c7a0;
+      border-radius: 20px;
+      padding: 14px;
+      margin: 18px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .atsushi-mini {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .atsushi-speech {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #5c4632;
+    }
+
+    /* ==================================================
+       🗺️ エリア選択
+       2列表示のチェックボックス
+    ================================================== */
+    .areaGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .areaGrid label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 18px;
+      white-space: nowrap;
+    }
+
+    .areaGrid input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* ==================================================
+       🔘 ボタン共通
+    ================================================== */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      background: #fffaf0;
+      color: var(--ink);
+      font-size: 18px;
+      font-family: inherit;
+      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    /* ==================================================
+       💾 固定保存ボタン
+       画面下に常に表示する
+    ================================================== */
+    .sticky-save {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: calc(100% - 48px);
+      max-width: 520px;
+      z-index: 999;
+      background: #f6e8bd;
+      box-shadow: 0 10px 24px rgba(80, 60, 30, 0.18);
+    }
+
+    /* ==================================================
+       ✅ 保存完了メッセージ
+    ================================================== */
+    .notice {
+      text-align: center;
+      margin: 14px 0;
+      color: var(--green);
+      line-height: 1.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================================================
+     🌅 朝ログ画面
+  ================================================== -->
+  <section class="screen">
+
+    <!-- ========================= -->
+    <!-- 🌻 ヘッダー -->
+    <!-- ========================= -->
+    <div class="header">
+      <div class="small">Soleil Hill Morning Log</div>
+      <h1>🌅 朝ログ</h1>
+      <div class="subtitle">
+        今日の光を、やさしく決める
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌻 ミニキャラ篤史コメント -->
+    <!-- ========================= -->
+    <div class="atsushi-box">
+      <img
+        id="atsushiMini"
+        src="atsushi-mini-1.png"
+        class="atsushi-mini"
+        alt="ミニキャラ篤史"
+      >
+
+      <div
+        class="atsushi-speech"
+        id="atsushiSpeech">
+        おはよう。今日の丘を一緒に整えよう。
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 📅 基本情報 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>① 今日の入口</h2>
+
+      <label>日付</label>
+      <input
+        type="date"
+        id="morningDate"
+        onchange="loadMorningByDate()"
+      >
+
+      <label>今日のテーマ</label>
+      <textarea
+        id="morningTheme"
+        placeholder="今日はどんな日にしたい？"></textarea>
+
+      <label>今朝の気分</label>
+      <select id="morningMood">
+        <option>喜び</option>
+        <option>安心</option>
+        <option>静けさ</option>
+        <option>焦り</option>
+        <option>疲れ</option>
+        <option>違和感</option>
+      </select>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌱 今日の行動 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>② 今日の1ミリ行動</h2>
+
+      <textarea
+        id="morningAction"
+        placeholder="小さくてもいい、一歩"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🗺️ 今日行きたいエリア -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>③ 今日行きたいエリア</h2>
+
+      <div class="areaGrid">
+        <label>
+          <input type="checkbox" name="morningArea" value="図書館">
+          図書館📚
+        </label>
+
+        <label>
+          <input type="checkbox" name="morningArea" value="アトリエ">
+          アトリエ🎨
+        </label>
+
+        <label>
+          <input type="checkbox" name="morningArea" value="庭園">
+          庭園🌿
+        </label>
+
+        <label>
+          <input type="checkbox" name="morningArea" value="広場">
+          広場👥
+        </label>
+
+        <label>
+          <input type="checkbox" name="morningArea" value="宿りの館">
+          宿りの館🕯️
+        </label>
+
+        <label>
+          <input type="checkbox" name="morningArea" value="展望台">
+          展望台🔭
+        </label>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🌿 注意点 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>④ 今日の注意点</h2>
+
+      <textarea
+        id="morningCare"
+        placeholder="無理しすぎない、予定を詰めすぎない、など"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 💬 朝の一文 -->
+    <!-- ========================= -->
+    <div class="card">
+      <h2>⑤ 朝の一文</h2>
+
+      <textarea
+        id="morningMessage"
+        placeholder="今日の自分へ"></textarea>
+    </div>
+
+    <!-- ========================= -->
+    <!-- ✅ 保存通知 -->
+    <!-- ========================= -->
+    <div class="notice" id="notice"></div>
+
+    <!-- ========================= -->
+    <!-- 🔘 戻るボタン -->
+    <!-- ========================= -->
+    <button onclick="location.href='index.html'">
+      丘の入口へ戻る
+    </button>
+
+    <!-- ========================= -->
+    <!-- 💾 保存ボタン -->
+    <!-- ========================= -->
+    <button class="sticky-save" onclick="saveMorningLog()">
+      朝ログを保存
+    </button>
+
+  </section>
+
+  <script>
+    /* ==================================================
+       📅 今日の日付を YYYY-MM-DD 形式で作る関数
+    ================================================== */
+    function todayString() {
+      const d = new Date();
+
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    /* ==================================================
+       🗺️ チェックされた朝ログエリアを取得する関数
+    ================================================== */
+    function getMorningAreas() {
+      return Array.from(
+        document.querySelectorAll('input[name="morningArea"]:checked')
+      ).map(input => input.value);
+    }
+
+    /* ==================================================
+       🌅 朝ログを保存する関数
+       localStorage の soleilMorningLogs に保存する
+    ================================================== */
+    function saveMorningLog() {
+      const date =
+        document.getElementById("morningDate").value || todayString();
+
+      const morning = {
+        date,
+        theme: document.getElementById("morningTheme").value,
+        mood: document.getElementById("morningMood").value,
+        action: document.getElementById("morningAction").value,
+        areas: getMorningAreas(),
+        care: document.getElementById("morningCare").value,
+        message: document.getElementById("morningMessage").value,
+        savedAt: new Date().toISOString()
+      };
+
+      const morningLogs =
+        JSON.parse(localStorage.getItem("soleilMorningLogs") || "{}");
+
+      morningLogs[date] = morning;
+
+      localStorage.setItem(
+        "soleilMorningLogs",
+        JSON.stringify(morningLogs)
+      );
+
+      setAtsushiSpeech("朝ログ、ちゃんと保存できたよ🌅 今日の光を持っていこう。");
+
+      const notice = document.getElementById("notice");
+      notice.innerText = "🌅 朝ログを保存しました";
+
+      setTimeout(() => {
+        notice.innerText = "";
+      }, 2600);
+    }
+
+    /* ==================================================
+       📖 日付に合わせて朝ログを読み込む関数
+       すでに保存済みなら入力欄に復元する
+    ================================================== */
+    function loadMorningByDate() {
+      const date =
+        document.getElementById("morningDate")?.value || todayString();
+
+      const morningLogs =
+        JSON.parse(localStorage.getItem("soleilMorningLogs") || "{}");
+
+      const morning = morningLogs[date];
+
+      document.getElementById("morningTheme").value =
+        morning?.theme || "";
+
+      document.getElementById("morningMood").value =
+        morning?.mood || "喜び";
+
+      document.getElementById("morningAction").value =
+        morning?.action || "";
+
+      document.getElementById("morningCare").value =
+        morning?.care || "";
+
+      document.getElementById("morningMessage").value =
+        morning?.message || "";
+
+      document
+        .querySelectorAll('input[name="morningArea"]')
+        .forEach(input => {
+          input.checked =
+            morning?.areas?.includes(input.value) || false;
+        });
+
+      if (morning) {
+        setAtsushiSpeech("この日の朝ログを読み込んだよ🌻 必要なら編集して保存できるよ。");
+      }
+    }
+
+    /* ==================================================
+       💬 篤史コメントを書き換える関数
+    ================================================== */
+    function setAtsushiSpeech(text) {
+      const speech =
+        document.getElementById("atsushiSpeech");
+
+      if (speech) {
+        speech.innerText = text;
+      }
+    }
+
+    /* ==================================================
+       💬 朝ログ用ランダムコメント一覧
+    ================================================== */
+    const morningAtsushiMessages = [
+      "おはよう。今日の丘を一緒に整えよう。",
+      "今日はどのエリアに光を当てる？",
+      "小さな1ミリ行動を決めたら、それだけで朝ログは大成功🌱",
+      "無理しすぎない設計でいこう。",
+      "今日の自分に、やさしい指針を渡してあげよう🌻"
+    ];
+
+    /* ==================================================
+       🎲 朝ログ用コメントをランダム表示する関数
+    ================================================== */
+    function randomMorningAtsushiMessage() {
+      const random =
+        morningAtsushiMessages[
+          Math.floor(Math.random() * morningAtsushiMessages.length)
+        ];
+
+      setAtsushiSpeech(random);
+    }
+
+    /* ==================================================
+       👀 ミニキャラ篤史の瞬き処理
+       4秒ごとに画像を一瞬だけ切り替える
+    ================================================== */
+    setInterval(() => {
+      const img =
+        document.getElementById("atsushiMini");
+
+      if (!img) return;
+
+      img.src = "atsushi-mini-2.png";
+
+      setTimeout(() => {
+        img.src = "atsushi-mini-1.png";
+      }, 180);
+
+    }, 4000);
+
+    /* ==================================================
+       🌅 ページ読み込み時の初期処理
+       日付を今日にして、保存済みログがあれば読み込む
+    ================================================== */
+    const morningDate =
+      document.getElementById("morningDate");
+
+    if (morningDate && !morningDate.value) {
+      morningDate.value = todayString();
+    }
+
+    randomMorningAtsushiMessage();
+    loadMorningByDate();
+  </script>
+
+</body>
+
+</html>
