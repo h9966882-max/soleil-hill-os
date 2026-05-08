@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <title>ソレイユ日誌｜週次ログ</title>
+
+  <style>
+    /* ==================================================
+       🌻 色の設定
+    ================================================== */
+    :root {
+      --paper: #fff9ea;
+      --ink: #4a3422;
+      --gold: #b99a55;
+      --green: #768b4b;
+      --soft: rgba(255, 249, 234, 0.9);
+    }
+
+    /* ==================================================
+       🌻 ページ全体
+    ================================================== */
+    body {
+      margin: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.75), transparent 35%),
+        linear-gradient(#f7e3b5, #fff7da);
+    }
+
+    .screen {
+      min-height: 100vh;
+      padding: 28px 18px 110px;
+      box-sizing: border-box;
+    }
+
+    /* ==================================================
+       🌻 ヘッダー
+    ================================================== */
+    .header {
+      text-align: center;
+      border: 1px solid var(--gold);
+      border-radius: 18px;
+      padding: 22px 12px;
+      background: var(--soft);
+      margin-bottom: 18px;
+    }
+
+    .small {
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      margin: 6px 0;
+      font-size: 34px;
+      letter-spacing: .08em;
+      line-height: 1.4;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       📜 カード共通
+    ================================================== */
+    .card {
+      background: var(--soft);
+      border: 1px solid #d9c38b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(90, 60, 20, .08);
+      text-align: left;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      color: var(--green);
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d6c59b;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .72);
+      padding: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* ==================================================
+       🌻 篤史コメント
+    ================================================== */
+    .atsushi-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #fffdf7;
+      border: 1px solid #d8c7a0;
+      border-radius: 20px;
+      padding: 14px;
+      margin: 18px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .atsushi-mini {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .atsushi-speech {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #5c4632;
+      white-space: pre-line;
+    }
+
+    /* ==================================================
+       📊 自動集計エリア
+    ================================================== */
+    .summary-box {
+      font-size: 15px;
+      line-height: 1.8;
+      text-align: left;
+    }
+
+    .summary-box p {
+      margin: 8px 0;
+    }
+
+    /* ==================================================
+       🏷️ キーワードタグ
+    ================================================== */
+    .keyword-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      margin: 4px;
+      border: 1px solid #d8c29a;
+      border-radius: 999px;
+      background: #fffefa;
+      font-size: 13px;
+    }
+
+    /* ==================================================
+       ✅ 保存通知
+    ================================================== */
+    .notice {
+      text-align: center;
+      margin: 14px 0;
+      color: var(--green);
+      line-height: 1.8;
+    }
+
+    /* ==================================================
+       🔘 ボタン共通
+    ================================================== */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px;
+      background: #fffaf0;
+      color: var(--ink);
+      font-size: 18px;
+      font-family: inherit;
+      box-shadow: 0 6px 18px rgba(80, 50, 20, .18);
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    .save-button {
+      background: #f6e8bd;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="screen">
+
+    <!-- ==================================================
+       🌻 ヘッダー
+    ================================================== -->
+    <div class="header">
+      <div class="small">Soleil Hill Weekly Log</div>
+      <h1>🌻 ソレイユの丘<br>週次ログ</h1>
+      <p>一週間の流れを観測し、来週の道を整える</p>
+    </div>
+
+    <!-- ==================================================
+       🌻 篤史コメントエリア
+    ================================================== -->
+    <div class="atsushi-box">
+      <img
+        id="atsushiMini"
+        src="atsushi-mini-1.png"
+        class="atsushi-mini"
+        alt="ミニキャラ篤史"
+      >
+
+      <div
+        class="atsushi-speech"
+        id="atsushiSpeech">
+        今週の丘を、一緒に振り返ろう。
+      </div>
+    </div>
+
+    <!-- ==================================================
+       📅 期間設定
+    ================================================== -->
+    <div class="card">
+      <h2>① 期間設定</h2>
+
+      <label>開始日</label>
+      <input
+        type="date"
+        id="weekStart"
+        onchange="onWeekRangeChange()"
+      >
+
+      <label>終了日</label>
+      <input
+        type="date"
+        id="weekEnd"
+        onchange="onWeekRangeChange()"
+      >
+    </div>
+
+    <!-- ==================================================
+       📊 日次ログからの自動集計
+    ================================================== -->
+    <div class="card">
+      <h2>② 今週の流れ</h2>
+      <div id="weeklySummary" class="summary-box">
+        期間を設定すると、日次ログから自動集計されます。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>③ エリア別滞在回数</h2>
+      <div id="weeklyAreaCounts" class="summary-box">
+        期間を設定すると、エリア別の滞在回数が表示されます。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>④ 感情の流れ</h2>
+      <div id="weeklyMoodFlow" class="summary-box">
+        期間を設定すると、曜日ごとの感情が表示されます。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⑤ 今週のキーワード候補</h2>
+      <div id="weeklyKeywords" class="summary-box">
+        テーマ・一文・制作ログから候補を表示します。
+      </div>
+    </div>
+
+    <!-- ==================================================
+       ✍️ 手入力レビュー
+    ================================================== -->
+    <div class="card">
+      <h2>⑥ 今週のハイライト</h2>
+      <textarea id="weekHighlight" placeholder="今週印象に残ったこと"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑦ エリア別サマリー</h2>
+
+      <label>気づき</label>
+      <textarea id="weekAreaNotice" placeholder="エリアごとの気づき"></textarea>
+
+      <label>改善したいこと</label>
+      <textarea id="weekAreaImprove" placeholder="改善したいこと"></textarea>
+
+      <label>来週へのアクション</label>
+      <textarea id="weekAreaAction" placeholder="来週へのアクション"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑧ 習慣・ルーティン</h2>
+
+      <label>続けられたこと</label>
+      <textarea id="weekRoutineKept" placeholder="続けられたこと"></textarea>
+
+      <label>改善したいこと</label>
+      <textarea id="weekRoutineImprove" placeholder="改善したいこと"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑨ 今週の気づき</h2>
+      <textarea id="weekNotice" placeholder="今週気づいたこと"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑩ パターンと傾向</h2>
+      <textarea id="weekPattern" placeholder="今週よく出てきた思考・感情・行動のパターン"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑪ 学びと残したいこと</h2>
+      <textarea id="weekLearning" placeholder="学び・続けたいこと・手放したいこと"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑫ 来週のフォーカス</h2>
+      <textarea id="weekFocus" placeholder="来週、特に意識したいこと"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>⑬ 一言まとめ</h2>
+      <textarea id="weekOneLine" placeholder="今週を一言でまとめると？"></textarea>
+    </div>
+
+    <!-- ==================================================
+       ✅ 保存通知
+    ================================================== -->
+    <div class="notice" id="notice"></div>
+
+    <!-- ==================================================
+       🔘 操作ボタン
+    ================================================== -->
+    <button class="save-button" onclick="saveWeeklyLog()">
+      週次ログを保存
+    </button>
+
+    <button onclick="location.href='weekly-archive.html'">
+      週次ログの記録を見る
+    </button>
+
+    <button onclick="location.href='index.html'">
+      丘の入口へ戻る
+    </button>
+
+  </section>
+
+  <script>
+    /* ==================================================
+       📦 localStorageから安全にデータを読む関数
+    ================================================== */
+    function readStorage(key) {
+      return JSON.parse(
+        localStorage.getItem(key) || "{}"
+      );
+    }
+
+    /* ==================================================
+       📦 localStorageへデータを保存する関数
+    ================================================== */
+    function writeStorage(key, value) {
+      localStorage.setItem(
+        key,
+        JSON.stringify(value)
+      );
+    }
+
+    /* ==================================================
+       📅 今日の日付を YYYY-MM-DD 形式で作る関数
+    ================================================== */
+    function todayString() {
+      const d = new Date();
+
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    /* ==================================================
+       📅 週次ログのキーを作る関数
+       例：2026-05-01_2026-05-07
+    ================================================== */
+    function getWeekKey(start, end) {
+      return `${start}_${end}`;
+    }
+
+    /* ==================================================
+       📖 週次ログ一覧を取得する関数
+    ================================================== */
+    function getWeeklyLogs() {
+      return readStorage("soleilWeeklyLogs");
+    }
+
+    /* ==================================================
+       📅 期間変更時の処理
+       自動集計＋保存済み週次ログの読み込み
+    ================================================== */
+    function onWeekRangeChange() {
+      renderWeeklySummary();
+      loadWeeklyLogByRange();
+    }
+
+    /* ==================================================
+       📖 保存済み週次ログを読み込む関数
+       同じ開始日・終了日の記録があれば復元する
+    ================================================== */
+    function loadWeeklyLogByRange() {
+      const start =
+        document.getElementById("weekStart").value;
+
+      const end =
+        document.getElementById("weekEnd").value;
+
+      if (!start || !end) return;
+
+      const weeklyLogs =
+        getWeeklyLogs();
+
+      const key =
+        getWeekKey(start, end);
+
+      const log =
+        weeklyLogs[key];
+
+      if (!log) return;
+
+      document.getElementById("weekHighlight").value = log.highlight || "";
+      document.getElementById("weekAreaNotice").value = log.areaNotice || "";
+      document.getElementById("weekAreaImprove").value = log.areaImprove || "";
+      document.getElementById("weekAreaAction").value = log.areaAction || "";
+      document.getElementById("weekRoutineKept").value = log.routineKept || "";
+      document.getElementById("weekRoutineImprove").value = log.routineImprove || "";
+      document.getElementById("weekNotice").value = log.notice || "";
+      document.getElementById("weekPattern").value = log.pattern || "";
+      document.getElementById("weekLearning").value = log.learning || "";
+      document.getElementById("weekFocus").value = log.focus || "";
+      document.getElementById("weekOneLine").value = log.oneLine || "";
+
+      setAtsushiSpeech("この週の記録を読み込んだよ🌻 必要なら編集して保存できるよ。");
+    }
+
+    /* ==================================================
+       💾 週次ログを保存する関数
+    ================================================== */
+    function saveWeeklyLog() {
+      const start =
+        document.getElementById("weekStart").value;
+
+      const end =
+        document.getElementById("weekEnd").value;
+
+      if (!start || !end) {
+        alert("期間を入力してね🌻");
+        return;
+      }
+
+      const key =
+        getWeekKey(start, end);
+
+      const weeklyLogs =
+        getWeeklyLogs();
+
+      weeklyLogs[key] = {
+        key,
+        start,
+        end,
+
+        highlight: document.getElementById("weekHighlight").value,
+        areaNotice: document.getElementById("weekAreaNotice").value,
+        areaImprove: document.getElementById("weekAreaImprove").value,
+        areaAction: document.getElementById("weekAreaAction").value,
+        routineKept: document.getElementById("weekRoutineKept").value,
+        routineImprove: document.getElementById("weekRoutineImprove").value,
+        notice: document.getElementById("weekNotice").value,
+        pattern: document.getElementById("weekPattern").value,
+        learning: document.getElementById("weekLearning").value,
+        focus: document.getElementById("weekFocus").value,
+        oneLine: document.getElementById("weekOneLine").value,
+
+        savedAt: new Date().toISOString()
+      };
+
+      writeStorage("soleilWeeklyLogs", weeklyLogs);
+
+      setAtsushiSpeech("今週の丘、ちゃんと保存できたよ🌻 来週への道が少し見えてきたね。");
+
+      const notice =
+        document.getElementById("notice");
+
+      notice.innerText =
+        "🌻 週次ログを保存しました";
+
+      setTimeout(() => {
+        notice.innerText = "";
+      }, 2600);
+    }
+
+    /* ==================================================
+       📊 週次サマリーを自動集計する関数
+       夜ログ soleilLogs と 朝ログ soleilMorningLogs を参照する
+    ================================================== */
+    function renderWeeklySummary() {
+      const start =
+        document.getElementById("weekStart").value;
+
+      const end =
+        document.getElementById("weekEnd").value;
+
+      if (!start || !end) return;
+
+      const nightLogs =
+        readStorage("soleilLogs");
+
+      const morningLogs =
+        readStorage("soleilMorningLogs");
+
+      const nightResult =
+        Object.values(nightLogs).filter(log =>
+          log.date >= start && log.date <= end
+        );
+
+      const morningResult =
+        Object.values(morningLogs).filter(log =>
+          log.date >= start && log.date <= end
+        );
+
+      const moods = {};
+      const areas = {};
+      const keywordSource = [];
+
+      let energyTotal = 0;
+      let energyCount = 0;
+
+      nightResult.forEach(log => {
+        if (log.mood) {
+          moods[log.mood] = (moods[log.mood] || 0) + 1;
+        }
+
+        if (log.energy !== undefined) {
+          energyTotal += Number(log.energy || 0);
+          energyCount++;
+        }
+
+        if (Array.isArray(log.areas)) {
+          log.areas.forEach(area => {
+            areas[area] = (areas[area] || 0) + 1;
+          });
+        }
+
+        [
+          log.theme,
+          log.oneLine,
+          log.create,
+          log.action,
+          log.done,
+          log.think
+        ].forEach(text => {
+          if (text) keywordSource.push(text);
+        });
+      });
+
+      morningResult.forEach(log => {
+        if (log.mood) {
+          moods[log.mood] = (moods[log.mood] || 0) + 1;
+        }
+
+        if (Array.isArray(log.areas)) {
+          log.areas.forEach(area => {
+            areas[area] = (areas[area] || 0) + 1;
+          });
+        }
+
+        [
+          log.theme,
+          log.action,
+          log.message,
+          log.care
+        ].forEach(text => {
+          if (text) keywordSource.push(text);
+        });
+      });
+
+      const topMood =
+        getTopKey(moods) || "未記録";
+
+      const topArea =
+        getTopKey(areas) || "未記録";
+
+      const avgEnergy =
+        energyCount
+          ? (energyTotal / energyCount).toFixed(1)
+          : "未記録";
+
+      document.getElementById("weeklySummary").innerHTML = `
+        <p>🌅 朝ログ：${morningResult.length}日分</p>
+        <p>🌙 夜ログ：${nightResult.length}日分</p>
+        <p>🌿 一番多かった感情：${topMood}</p>
+        <p>🏡 一番多かったエリア：${topArea}</p>
+        <p>⭐ 平均エネルギー：${avgEnergy}</p>
+      `;
+
+      document.getElementById("weeklyAreaCounts").innerHTML =
+        Object.keys(areas).length
+          ? Object.entries(areas)
+              .sort((a,b) => b[1] - a[1])
+              .map(([area,count]) => `<p>${area}：${count}回</p>`)
+              .join("")
+          : "エリア記録はまだありません。";
+
+      document.getElementById("weeklyMoodFlow").innerHTML =
+        nightResult.length || morningResult.length
+          ? buildMoodFlow(morningResult, nightResult)
+          : "感情の記録はまだありません。";
+
+      const keywords =
+        extractKeywords(keywordSource.join(" "));
+
+      document.getElementById("weeklyKeywords").innerHTML =
+        keywords.length
+          ? keywords
+              .map(word => `<span class="keyword-tag">${word}</span>`)
+              .join("")
+          : "キーワード候補はまだありません。";
+
+      setAtsushiSpeech(
+        generateWeeklyAtsushiComment(
+          morningResult,
+          nightResult,
+          topMood,
+          topArea
+        )
+      );
+    }
+
+    /* ==================================================
+       🌊 感情の流れを作る関数
+       朝と夜がある日は両方表示する
+    ================================================== */
+    function buildMoodFlow(morningResult, nightResult) {
+      const dateMap = {};
+
+      morningResult.forEach(log => {
+        if (!dateMap[log.date]) dateMap[log.date] = {};
+        dateMap[log.date].morning = log.mood;
+      });
+
+      nightResult.forEach(log => {
+        if (!dateMap[log.date]) dateMap[log.date] = {};
+        dateMap[log.date].night = log.mood;
+      });
+
+      return Object.keys(dateMap)
+        .sort()
+        .map(date => {
+          const item = dateMap[date];
+
+          return `
+            <p>
+              ${date}：
+              🌅 ${item.morning || "未記録"} /
+              🌙 ${item.night || "未記録"}
+            </p>
+          `;
+        })
+        .join("");
+    }
+
+    /* ==================================================
+       🏷️ キーワード抽出
+       簡易版：2文字以上の言葉を頻度順に表示
+    ================================================== */
+    function extractKeywords(text) {
+      const words = text
+        .replace(/[、。！!？?\n]/g, " ")
+        .split(" ")
+        .map(word => word.trim())
+        .filter(word => word.length >= 2);
+
+      const counts = {};
+
+      words.forEach(word => {
+        counts[word] = (counts[word] || 0) + 1;
+      });
+
+      return Object.entries(counts)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(item => item[0]);
+    }
+
+    /* ==================================================
+       🥇 一番多い項目を取得する関数
+    ================================================== */
+    function getTopKey(obj) {
+      let top = "";
+      let max = 0;
+
+      Object.keys(obj).forEach(key => {
+        if (obj[key] > max) {
+          max = obj[key];
+          top = key;
+        }
+      });
+
+      return top;
+    }
+
+    /* ==================================================
+       💬 週次ログ用の篤史コメント生成
+    ================================================== */
+    function generateWeeklyAtsushiComment(morningLogs, nightLogs, mood, area) {
+      const total =
+        morningLogs.length + nightLogs.length;
+
+      if (!total) {
+        return "まだこの週の記録は少ないみたい。\n最初の一歩からで大丈夫🌱";
+      }
+
+      if (morningLogs.length && nightLogs.length) {
+        return "朝の意図と夜の振り返りが、ちゃんと並んできたね。\nこの週はかなり観測しやすい丘になってるよ🌻";
+      }
+
+      if (area !== "未記録") {
+        return `今週は${area}の空気が強かったみたい。\nそこに今週の光が残ってるね🌻`;
+      }
+
+      if (mood !== "未記録") {
+        return `今週は「${mood}」がよく出てきたみたい。\n大事な流れかもしれないね。`;
+      }
+
+      return "今週の丘を、少しずつ読み解いていこう。";
+    }
+
+    /* ==================================================
+       💬 篤史コメントを書き換える関数
+    ================================================== */
+    function setAtsushiSpeech(text) {
+      const speech =
+        document.getElementById("atsushiSpeech");
+
+      if (speech) {
+        speech.innerText = text;
+      }
+    }
+
+    /* ==================================================
+       👀 ミニキャラ篤史の瞬き処理
+    ================================================== */
+    setInterval(() => {
+      const img =
+        document.getElementById("atsushiMini");
+
+      if (!img) return;
+
+      img.src = "atsushi-mini-2.png";
+
+      setTimeout(() => {
+        img.src = "atsushi-mini-1.png";
+      }, 180);
+
+    }, 4000);
+
+    /* ==================================================
+       🌻 ページ読み込み時の初期処理
+       URLに start/end があれば編集用に読み込める
+       例：weekly.html?start=2026-05-01&end=2026-05-07
+    ================================================== */
+    function initWeeklyPage() {
+      const params =
+        new URLSearchParams(window.location.search);
+
+      const startParam =
+        params.get("start");
+
+      const endParam =
+        params.get("end");
+
+      if (startParam) {
+        document.getElementById("weekStart").value = startParam;
+      }
+
+      if (endParam) {
+        document.getElementById("weekEnd").value = endParam;
+      }
+
+      if (startParam && endParam) {
+        onWeekRangeChange();
+      }
+    }
+
+    initWeeklyPage();
+  </script>
+
+</body>
+
+</html>
