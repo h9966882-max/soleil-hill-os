@@ -335,66 +335,76 @@
       return tags.join("");
     }
 
-    /* =========================================================
-      📝 一覧に出すタイトルを決める
-    ========================================================== */
-    function getArchiveTitle(date, stores) {
-      const morning = stores.morningLogs[date];
-      const night = stores.nightLogs[date];
-      const area = stores.areaLogs[date];
-      const observatory = getObservatoryLogByDate(stores, date);
-      const libraryLogs = getLibraryLogsByDate(stores, date);
+/* =========================================================
+  📝 一覧に出すタイトルを決める
+========================================================= */
+function getArchiveTitle(date, stores) {
+  const morning = stores.morningLogs[date];
+  const night = stores.nightLogs[date];
+  const area = stores.areaLogs[date];
+  const observatory = getObservatoryLogByDate(stores, date);
+  const libraryLogs = getLibraryLogsByDate(stores, date);
 
-      // 🌙 夜ログを優先
-      if (night?.oneLine) return night.oneLine;
-      if (night?.theme) return night.theme;
+  // 🌙 夜ログ優先
+  if (night?.oneLine) return night.oneLine;
+  if (night?.theme) return night.theme;
 
-      // 🌅 朝ログ
-      if (morning?.message) return morning.message;
-      if (morning?.theme) return morning.theme;
+  // 🌅 朝ログ
+  // 新仕様：goal を最優先
+  if (morning?.goal) return morning.goal;
 
-      // 🔭 展望台ログ
-      if (observatory?.theme) return observatory.theme;
-      if (observatory?.nextStep) return observatory.nextStep;
-      if (observatory?.situation) return observatory.situation;
+  // 旧仕様互換
+  if (morning?.theme) return morning.theme;
 
-      // 📚 図書館ログ
-      if (libraryLogs.length > 0) {
-        const firstLibraryLog = libraryLogs[0];
+  // 🔭 展望台ログ
+  if (observatory?.theme) return observatory.theme;
+  if (observatory?.nextStep) return observatory.nextStep;
+  if (observatory?.situation) return observatory.situation;
 
-        if (firstLibraryLog.oneLine) return firstLibraryLog.oneLine;
-        if (firstLibraryLog.definition) return firstLibraryLog.definition;
-        if (firstLibraryLog.source) return firstLibraryLog.source;
+  // 📚 図書館ログ
+  if (libraryLogs.length > 0) {
+    const firstLibraryLog = libraryLogs[0];
 
-        return "図書館に記録がある日";
-      }
+    if (firstLibraryLog.oneLine) return firstLibraryLog.oneLine;
+    if (firstLibraryLog.definition) return firstLibraryLog.definition;
+    if (firstLibraryLog.source) return firstLibraryLog.source;
 
-      // 🗺️ 旧エリアログ
-      if (area) {
-        const firstAreaName = Object.keys(area)[0];
-        const firstAreaLog = area[firstAreaName];
+    return "図書館に記録がある日";
+  }
 
-        if (firstAreaLog?.oneLine) return firstAreaLog.oneLine;
-        if (firstAreaLog?.theme) return firstAreaLog.theme;
+  // 🗺️ 旧エリアログ
+  if (area) {
+    const firstAreaName = Object.keys(area)[0];
+    const firstAreaLog = area[firstAreaName];
 
-        return `${firstAreaName}に記録がある日`;
-      }
+    if (firstAreaLog?.oneLine) return firstAreaLog.oneLine;
+    if (firstAreaLog?.theme) return firstAreaLog.theme;
 
-      return "名前のない一日";
-    }
+    return `${firstAreaName}に記録がある日`;
+  }
 
-    /* =========================================================
-      🌿 一覧に出す補足文を作る
-    ========================================================== */
-    function getArchiveMeta(date, stores) {
-      const night = stores.nightLogs[date];
+  return "名前のない一日";
+}
 
-      if (night?.mood) {
-        return `今日の主感情：${night.mood}`;
-      }
+/* =========================================================
+  🌿 一覧に出す補足文を作る
+========================================================= */
+function getArchiveMeta(date, stores) {
+  const morning = stores.morningLogs[date];
+  const night = stores.nightLogs[date];
 
-      return "朝ログ・エリアログ中心の日";
-    }
+  // 🌙 夜ログ優先
+  if (night?.mood) {
+    return `今日の主感情：${night.mood}`;
+  }
+
+  // 🌅 朝ログ
+  if (morning?.mood) {
+    return `今の状態：${morning.mood}`;
+  }
+
+  return "丘に記録を残した一日";
+}
 
     /* =========================================================
       📅 日付カードを作る
