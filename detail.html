@@ -165,6 +165,35 @@
   padding-bottom: 20px !important;
 }
     
+    /* =========================================================
+  ✅ 朝ログタスク表示
+========================================================= */
+
+.task-list {
+  margin-top: 8px;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0;
+  line-height: 1.7;
+}
+
+.task-check {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+/* =========================================================
+  🌻 篤史コメント拡張スロット
+========================================================= */
+
+.comment-slot {
+  margin-top: 18px;
+}
+    
   </style>
 </head>
 
@@ -234,35 +263,101 @@
         .map(area => `<span class="tag">${areaIcon(area)} ${area}</span>`)
         .join("");
     }
-
+    
     /* =========================================================
-      🌅 朝ログ表示
-    ========================================================== */
-    function renderMorningLog(date, morning) {
-      const box = document.getElementById("morningDetail");
+  ✅ 朝ログタスク表示用
+========================================================= */
+function renderTaskList(tasks, oldAction = "") {
 
-      if (!morning) {
-        box.innerHTML = "";
-        return;
-      }
+  // 新仕様 tasks
+  if (Array.isArray(tasks) && tasks.length > 0) {
 
-      box.innerHTML = `
-        <section class="card">
-          <h2>🌅 朝ログ</h2>
+    return `
+      <div class="task-list">
+        ${tasks.map(task => `
+          <div class="task-item">
+            <span class="task-check">
+              ${task.done ? "☑" : "☐"}
+            </span>
 
-          <div class="detail-row"><span class="label">今日のテーマ：</span>${showValue(morning.theme)}</div>
-          <div class="detail-row"><span class="label">今朝の気分：</span>${showValue(morning.mood)}</div>
-          <div class="detail-row"><span class="label">1ミリ行動：</span>${showValue(morning.action)}</div>
-          <div class="detail-row"><span class="label">行きたいエリア：</span>${renderAreaTags(morning.areas)}</div>
-          <div class="detail-row"><span class="label">注意点：</span>${showValue(morning.care)}</div>
-          <div class="detail-row"><span class="label">朝の一文：</span>${showValue(morning.message)}</div>
+            <span>
+              ${showValue(task.text)}
+            </span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
 
-          <button onclick="location.href='morninglog.html?date=${date}'">
-            朝ログを編集する
-          </button>
-        </section>
-      `;
-    }
+  // 旧仕様 action
+  return showValue(oldAction);
+}
+
+/* =========================================================
+  🌅 朝ログ表示
+========================================================= */
+function renderMorningLog(date, morning) {
+  const box = document.getElementById("morningDetail");
+
+  if (!morning) {
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = `
+    <section class="card">
+      <h2>🌅 朝ログ</h2>
+
+      <div class="detail-row">
+        <span class="label">今日の目標：</span>
+        ${showValue(morning.goal || morning.theme)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">今の状態：</span>
+        ${showValue(morning.mood)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">今日のやりたいこと：</span>
+
+        ${renderTaskList(
+          morning.tasks,
+          morning.action
+        )}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">行きたいエリア：</span>
+        ${renderAreaTags(morning.areas)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">今日の指針：</span>
+        ${showValue(
+          morning.guideline || morning.care
+        )}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">今日の小さな楽しみ：</span>
+        ${showValue(
+          morning.smallJoy || morning.message
+        )}
+      </div>
+
+      <!-- 🌻 今後ここに朝コメントを入れる -->
+      <div
+        id="morningComment"
+        class="comment-slot">
+      </div>
+
+      <button onclick="location.href='morninglog.html?date=${date}'">
+        朝ログを編集する
+      </button>
+    </section>
+  `;
+}
 
     /* =========================================================
       🌙 夜ログ表示
