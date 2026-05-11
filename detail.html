@@ -170,20 +170,19 @@
 ========================================================= */
 
 .task-list {
-  margin-top: 8px;
+  margin: 6px 0 14px;
 }
 
 .task-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   margin: 6px 0;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .task-check {
   flex-shrink: 0;
-  font-size: 1rem;
 }
 
 /* =========================================================
@@ -308,43 +307,17 @@ function renderMorningLog(date, morning) {
     <section class="card">
       <h2>🌅 朝ログ</h2>
 
-      <div class="detail-row">
-        <span class="label">今日の目標：</span>
-        ${showValue(morning.goal || morning.theme)}
-      </div>
+      <div class="detail-row"><span class="label">今日の目標：</span>${showValue(morning.goal || morning.theme)}</div>
+      <div class="detail-row"><span class="label">今の状態：</span>${showValue(morning.mood)}</div>
 
-      <div class="detail-row">
-        <span class="label">今の状態：</span>
-        ${showValue(morning.mood)}
-      </div>
+      <div class="detail-row"><span class="label">今日のやりたいこと：</span></div>
+      ${renderTaskList(morning.tasks, morning.action)}
 
-      <div class="detail-row">
-        <span class="label">今日のやりたいこと：</span>
+      <div class="detail-row"><span class="label">行きたいエリア：</span>${renderAreaTags(morning.areas)}</div>
+      <div class="detail-row"><span class="label">今日の指針：</span>${showValue(morning.guideline || morning.care)}</div>
+      <div class="detail-row"><span class="label">今日の小さな楽しみ：</span>${showValue(morning.smallJoy || morning.message)}</div>
 
-        ${renderTaskList(
-          morning.tasks,
-          morning.action
-        )}
-      </div>
-
-      <div class="detail-row">
-        <span class="label">行きたいエリア：</span>
-        ${renderAreaTags(morning.areas)}
-      </div>
-
-      <div class="detail-row">
-        <span class="label">今日の指針：</span>
-        ${showValue(
-          morning.guideline || morning.care
-        )}
-      </div>
-
-      <div class="detail-row">
-        <span class="label">今日の小さな楽しみ：</span>
-        ${showValue(
-          morning.smallJoy || morning.message
-        )}
-      </div>
+      <div id="morningComment" class="comment-slot"></div>
 
       <!-- 🌻 今後ここに朝コメントを入れる -->
       <div
