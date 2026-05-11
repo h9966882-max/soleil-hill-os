@@ -99,6 +99,13 @@
       font-size: 14px;
     }
 
+    .hint {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #7a6651;
+      margin: 4px 0 8px;
+    }
+
     /* ==================================================
        ✏️ 入力欄
     ================================================== */
@@ -121,10 +128,6 @@
       resize: vertical;
     }
 
-    /* ==================================================
-       📅 日付入力欄
-       スマホで崩れにくくする設定
-    ================================================== */
     input[type="date"] {
       -webkit-appearance: none;
       appearance: none;
@@ -164,8 +167,45 @@
     }
 
     /* ==================================================
+       ✅ 今日のやりたいこと
+    ================================================== */
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .task-row input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .task-row input[type="text"] {
+      flex: 1;
+    }
+
+    .task-delete {
+      width: auto;
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 14px;
+      box-shadow: none;
+      background: #fff4df;
+      border: 1px solid #dfc99a;
+    }
+
+    .add-task {
+      margin-top: 10px;
+      background: #fff7df;
+      box-shadow: 0 4px 12px rgba(80, 50, 20, .12);
+      font-size: 15px;
+      padding: 12px 18px;
+    }
+
+    /* ==================================================
        🗺️ エリア選択
-       2列表示のチェックボックス
     ================================================== */
     .areaGrid {
       display: grid;
@@ -209,10 +249,6 @@
       transform: translateY(2px);
     }
 
-    /* ==================================================
-       💾 固定保存ボタン
-       画面下に常に表示する
-    ================================================== */
     .sticky-save {
       position: fixed;
       left: 50%;
@@ -225,9 +261,6 @@
       box-shadow: 0 10px 24px rgba(80, 60, 30, 0.18);
     }
 
-    /* ==================================================
-       ✅ 保存完了メッセージ
-    ================================================== */
     .notice {
       text-align: center;
       margin: 14px 0;
@@ -239,14 +272,8 @@
 
 <body>
 
-  <!-- ==================================================
-     🌅 朝ログ画面
-  ================================================== -->
   <section class="screen">
 
-    <!-- ========================= -->
-    <!-- 🌻 ヘッダー -->
-    <!-- ========================= -->
     <div class="header">
       <div class="small">Soleil Hill Morning Log</div>
       <h1>🌅 朝ログ</h1>
@@ -255,9 +282,6 @@
       </div>
     </div>
 
-    <!-- ========================= -->
-    <!-- 🌻 ミニキャラ篤史コメント -->
-    <!-- ========================= -->
     <div class="atsushi-box">
       <img
         id="atsushiMini"
@@ -266,15 +290,13 @@
         alt="ミニキャラ篤史"
       >
 
-      <div
-        class="atsushi-speech"
-        id="atsushiSpeech">
+      <div class="atsushi-speech" id="atsushiSpeech">
         おはよう。今日の丘を一緒に整えよう。
       </div>
     </div>
 
     <!-- ========================= -->
-    <!-- 📅 基本情報 -->
+    <!-- 📅 今日の入口 -->
     <!-- ========================= -->
     <div class="card">
       <h2>① 今日の入口</h2>
@@ -286,31 +308,38 @@
         onchange="loadMorningByDate()"
       >
 
-      <label>今日のテーマ</label>
+      <label>今日の目標</label>
       <textarea
-        id="morningTheme"
-        placeholder="今日はどんな日にしたい？"></textarea>
+        id="morningGoal"
+        placeholder="今日は何を大切に進めたい？"></textarea>
 
-      <label>今朝の気分</label>
+      <label>今の状態</label>
       <select id="morningMood">
-        <option>喜び</option>
-        <option>安心</option>
-        <option>静けさ</option>
-        <option>焦り</option>
-        <option>疲れ</option>
-        <option>違和感</option>
+        <option value="喜び">喜び｜少し前向きで、動きやすい</option>
+        <option value="安心">安心｜落ち着いていて、守られている感じ</option>
+        <option value="静けさ">静けさ｜大きな波はなく、内側が静か</option>
+        <option value="集中">集中｜やることに意識が向いている</option>
+        <option value="焦り">焦り｜急がなきゃ、という感覚がある</option>
+        <option value="疲れ">疲れ｜エネルギーが少なく、休息も必要</option>
+        <option value="違和感">違和感｜まだ言葉にならない引っかかりがある</option>
+        <option value="回復途中">回復途中｜無理はできないけど、少し戻ってきている</option>
       </select>
     </div>
 
     <!-- ========================= -->
-    <!-- 🌱 今日の行動 -->
+    <!-- ✅ 今日のやりたいこと -->
     <!-- ========================= -->
     <div class="card">
-      <h2>② 今日の1ミリ行動</h2>
+      <h2>② 今日のやりたいこと</h2>
+      <p class="hint">
+        小さくてもOK。終わったらチェックできるようにしておこう。
+      </p>
 
-      <textarea
-        id="morningAction"
-        placeholder="小さくてもいい、一歩"></textarea>
+      <div id="taskList"></div>
+
+      <button class="add-task" type="button" onclick="addTaskRow()">
+        ＋ やりたいことを追加
+      </button>
     </div>
 
     <!-- ========================= -->
@@ -353,42 +382,33 @@
     </div>
 
     <!-- ========================= -->
-    <!-- 🌿 注意点 -->
+    <!-- 🕯️ 今日の指針 -->
     <!-- ========================= -->
     <div class="card">
-      <h2>④ 今日の注意点</h2>
+      <h2>④ 今日の指針</h2>
 
       <textarea
         id="morningCare"
-        placeholder="無理しすぎない、予定を詰めすぎない、など"></textarea>
+        placeholder="今日、自分に渡しておきたい指針。無理しすぎない、優先順位を見誤らない、など"></textarea>
     </div>
 
     <!-- ========================= -->
-    <!-- 💬 朝の一文 -->
+    <!-- ✨ 今日の小さな楽しみ -->
     <!-- ========================= -->
     <div class="card">
-      <h2>⑤ 朝の一文</h2>
+      <h2>⑤ 今日の小さな楽しみ</h2>
 
       <textarea
-        id="morningMessage"
-        placeholder="今日の自分へ"></textarea>
+        id="morningSmallJoy"
+        placeholder="カフェに行く、本を読む、好きな服を着る、少しだけ編む、など"></textarea>
     </div>
 
-    <!-- ========================= -->
-    <!-- ✅ 保存通知 -->
-    <!-- ========================= -->
     <div class="notice" id="notice"></div>
 
-    <!-- ========================= -->
-    <!-- 🔘 戻るボタン -->
-    <!-- ========================= -->
     <button onclick="location.href='index.html'">
       丘の入口へ戻る
     </button>
 
-    <!-- ========================= -->
-    <!-- 💾 保存ボタン -->
-    <!-- ========================= -->
     <button class="sticky-save" onclick="saveMorningLog()">
       朝ログを保存
     </button>
@@ -415,21 +435,102 @@
     }
 
     /* ==================================================
+       ✅ 今日のやりたいこと：行を追加する関数
+    ================================================== */
+    function addTaskRow(task = { text: "", done: false }) {
+      const taskList = document.getElementById("taskList");
+
+      const row = document.createElement("div");
+      row.className = "task-row";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.done || false;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "今日やりたいこと";
+      input.value = task.text || "";
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "task-delete";
+      deleteButton.innerText = "削除";
+      deleteButton.onclick = () => row.remove();
+
+      row.appendChild(checkbox);
+      row.appendChild(input);
+      row.appendChild(deleteButton);
+
+      taskList.appendChild(row);
+    }
+
+    /* ==================================================
+       ✅ 今日のやりたいことを取得する関数
+    ================================================== */
+    function getMorningTasks() {
+      return Array.from(document.querySelectorAll(".task-row"))
+        .map(row => {
+          const checkbox = row.querySelector('input[type="checkbox"]');
+          const textInput = row.querySelector('input[type="text"]');
+
+          return {
+            text: textInput.value.trim(),
+            done: checkbox.checked
+          };
+        })
+        .filter(task => task.text !== "");
+    }
+
+    /* ==================================================
+       ✅ 今日のやりたいことを復元する関数
+    ================================================== */
+    function restoreMorningTasks(tasks, oldActionText = "") {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+
+      if (Array.isArray(tasks) && tasks.length > 0) {
+        tasks.forEach(task => addTaskRow(task));
+        return;
+      }
+
+      if (oldActionText) {
+        addTaskRow({
+          text: oldActionText,
+          done: false
+        });
+        return;
+      }
+
+      addTaskRow();
+    }
+
+    /* ==================================================
        🌅 朝ログを保存する関数
-       localStorage の soleilMorningLogs に保存する
     ================================================== */
     function saveMorningLog() {
       const date =
         document.getElementById("morningDate").value || todayString();
 
+      const tasks = getMorningTasks();
+
       const morning = {
         date,
-        theme: document.getElementById("morningTheme").value,
+
+        // 新項目
+        goal: document.getElementById("morningGoal").value,
         mood: document.getElementById("morningMood").value,
-        action: document.getElementById("morningAction").value,
+        tasks,
         areas: getMorningAreas(),
+        guideline: document.getElementById("morningCare").value,
+        smallJoy: document.getElementById("morningSmallJoy").value,
+
+        // 既存ページとの互換用
+        theme: document.getElementById("morningGoal").value,
+        action: tasks.map(task => `${task.done ? "☑" : "☐"} ${task.text}`).join("\n"),
         care: document.getElementById("morningCare").value,
-        message: document.getElementById("morningMessage").value,
+        message: document.getElementById("morningSmallJoy").value,
+
         savedAt: new Date().toISOString()
       };
 
@@ -455,7 +556,6 @@
 
     /* ==================================================
        📖 日付に合わせて朝ログを読み込む関数
-       すでに保存済みなら入力欄に復元する
     ================================================== */
     function loadMorningByDate() {
       const date =
@@ -466,20 +566,22 @@
 
       const morning = morningLogs[date];
 
-      document.getElementById("morningTheme").value =
-        morning?.theme || "";
+      document.getElementById("morningGoal").value =
+        morning?.goal || morning?.theme || "";
 
       document.getElementById("morningMood").value =
         morning?.mood || "喜び";
 
-      document.getElementById("morningAction").value =
-        morning?.action || "";
-
       document.getElementById("morningCare").value =
-        morning?.care || "";
+        morning?.guideline || morning?.care || "";
 
-      document.getElementById("morningMessage").value =
-        morning?.message || "";
+      document.getElementById("morningSmallJoy").value =
+        morning?.smallJoy || morning?.message || "";
+
+      restoreMorningTasks(
+        morning?.tasks,
+        morning?.action || ""
+      );
 
       document
         .querySelectorAll('input[name="morningArea"]')
@@ -511,7 +613,7 @@
     const morningAtsushiMessages = [
       "おはよう。今日の丘を一緒に整えよう。",
       "今日はどのエリアに光を当てる？",
-      "小さな1ミリ行動を決めたら、それだけで朝ログは大成功🌱",
+      "やりたいことを小さく並べたら、それだけで朝ログは大成功🌱",
       "無理しすぎない設計でいこう。",
       "今日の自分に、やさしい指針を渡してあげよう🌻"
     ];
@@ -530,7 +632,6 @@
 
     /* ==================================================
        👀 ミニキャラ篤史の瞬き処理
-       4秒ごとに画像を一瞬だけ切り替える
     ================================================== */
     setInterval(() => {
       const img =
@@ -548,7 +649,6 @@
 
     /* ==================================================
        🌅 ページ読み込み時の初期処理
-       日付を今日にして、保存済みログがあれば読み込む
     ================================================== */
     const morningDate =
       document.getElementById("morningDate");
