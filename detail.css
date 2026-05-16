@@ -82,12 +82,16 @@ h2 {
 }
 
 .atsushi-comment {
-  margin-top: 16px;
-  padding: 16px;
+  margin-top: 14px;
+  padding: 18px 20px;
   border-radius: 18px;
+
   background: rgba(248, 239, 197, 0.86);
+
   border: 1px solid rgba(170, 135, 70, 0.28);
-  line-height: 1.9;
+
+  line-height: 1.75;
+
   white-space: pre-wrap;
 }
 
