@@ -213,7 +213,7 @@ function renderMorningLog(date, morning) {
         generateMorningComment(morning)
       );
   }
-}
+
 
 /* =========================================================
   🌙 夜ログ表示
