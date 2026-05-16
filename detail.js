@@ -380,13 +380,21 @@ function renderDetailPage() {
     "dateTitle"
   ).innerText = date;
 
-  const morningLogs =
-    readStorage("soleilMorningLogs");
+const morningLogs =
+  readStorage("soleilMorningLogs");
 
-  renderMorningLog(
-    date,
-    morningLogs[date]
-  );
+const nightLogs =
+  readStorage("soleilLogs");
+
+renderMorningLog(
+  date,
+  morningLogs[date]
+);
+
+renderNightLog(
+  date,
+  nightLogs[date]
+);
 }
 
 /* =========================================================
