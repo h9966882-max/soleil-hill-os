@@ -365,6 +365,37 @@ function renderNightLog(date, night) {
 
     </section>
   `;
+  
+  const morningLogs =
+  readStorage("soleilMorningLogs");
+
+const morning =
+  morningLogs[date] || {};
+
+const morningComment =
+  generateMorningComment(morning);
+
+const nightComment =
+  generateNightComment(night);
+
+document.getElementById(
+  "atsushiCommentBox"
+).innerHTML = `
+
+<section class="card atsushi-comment">
+
+  <h2>🌅 朝の篤史コメント</h2>
+
+  <p>${morningComment}</p>
+
+  <h2>🌙 夜の篤史コメント</h2>
+
+  <p>${nightComment}</p>
+
+</section>
+
+`;
+  
 }
 
 
