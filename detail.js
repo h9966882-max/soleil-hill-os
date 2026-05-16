@@ -199,21 +199,22 @@ function renderMorningLog(date, morning) {
     🌻 篤史コメント生成
   ========================================================== */
 
-  if (
-    typeof buildAtsushiComment === "function" &&
-    typeof generateMorningComment === "function"
-  ) {
+/*
+if (
+  typeof buildAtsushiComment === "function" &&
+  typeof generateMorningComment === "function"
+) {
 
-    document.getElementById(
-      "morningComment"
-    ).innerHTML =
+  document.getElementById(
+    "morningComment"
+  ).innerHTML =
 
-      buildAtsushiComment(
-        "篤史からの朝コメント 🌅",
-        generateMorningComment(morning)
-      );
-  }
-
+    buildAtsushiComment(
+      "篤史からの朝コメント 🌅",
+      generateMorningComment(morning)
+    );
+}
+*/
 
 /* =========================================================
   🌙 夜ログ表示
