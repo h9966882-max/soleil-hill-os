@@ -199,7 +199,6 @@ function renderMorningLog(date, morning) {
     🌻 篤史コメント生成
   ========================================================== */
 
-/*
 if (
   typeof buildAtsushiComment === "function" &&
   typeof generateMorningComment === "function"
@@ -214,7 +213,6 @@ if (
       generateMorningComment(morning)
     );
 }
-*/
 }
 
 /* =========================================================
