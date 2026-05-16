@@ -398,16 +398,19 @@ function renderDetailPage() {
     nightLogs[date]
   );
   
-  document.getElementById(
-  "nightDetail"
-).innerHTML +=
+if (nightLogs[date]) {
 
-  buildAtsushiComment(
-    "篤史からの夜コメント 🌙",
-    generateNightComment(
-      nightLogs[date]
-    )
-  );
+  document.getElementById(
+    "nightDetail"
+  ).innerHTML +=
+
+    buildAtsushiComment(
+      "篤史からの夜コメント 🌙",
+      generateNightComment(
+        nightLogs[date]
+      )
+    );
+}
 
 }
 
