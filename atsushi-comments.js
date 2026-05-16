@@ -109,6 +109,47 @@ return randomPick(
 
 }
 
+
+
+function pickNightCategory(night) {
+
+  const mood =
+    night.mood || "";
+
+  if (
+    mood.includes("喜")
+  ) {
+    return "joy";
+  }
+
+  if (
+    mood.includes("疲") ||
+    mood.includes("回復")
+  ) {
+    return "recovery";
+  }
+
+  if (
+    mood.includes("焦")
+  ) {
+    return "pressure";
+  }
+
+  if (
+    mood.includes("不安") ||
+    mood.includes("違和感")
+  ) {
+    return "uneasy";
+  }
+
+  return "calm";
+}
+
+
+
+
+
+
 /* =========================================================
   🌙 夜ログコメント生成
 ========================================================= */
