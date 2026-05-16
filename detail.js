@@ -380,21 +380,23 @@ function renderDetailPage() {
     "dateTitle"
   ).innerText = date;
 
-const morningLogs =
-  readStorage("soleilMorningLogs");
+  /* 🌅 朝ログ */
+  const morningLogs =
+    readStorage("soleilMorningLogs");
 
-const nightLogs =
-  readStorage("soleilLogs");
+  /* 🌙 夜ログ */
+  const nightLogs =
+    readStorage("soleilLogs");
 
-renderMorningLog(
-  date,
-  morningLogs[date]
-);
+  renderMorningLog(
+    date,
+    morningLogs[date]
+  );
 
-renderNightLog(
-  date,
-  nightLogs[date]
-);
+  renderNightLog(
+    date,
+    nightLogs[date]
+  );
 }
 
 /* =========================================================
