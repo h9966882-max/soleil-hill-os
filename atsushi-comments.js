@@ -45,8 +45,182 @@ function generateNightComment(night) {
 
   if (!night) return "";
 
-  const areas =
-    night.areas || [];
+const mood =
+  night.mood || "";
+
+const areas =
+  night.areas || [];
+
+const text = `
+  ${night.done}
+  ${night.heart}
+  ${night.create}
+  ${night.think}
+  ${night.oneLine}
+`;
+
+const morningLogs =
+  JSON.parse(
+    localStorage.getItem("soleilMorningLogs") || "{}"
+  );
+
+const morning =
+  morningLogs[night.date] || {};
+
+
+/* 🌿 朝夜連動：回復継続 */
+
+if (
+  morning.mood?.includes("回復") &&
+  mood.includes("疲")
+) {
+
+  const comments = [
+
+    `
+    朝からずっと、
+    “無理しすぎない形”
+    を探しながら進んでいた一日だったんだね🌿
+    `,
+
+    `
+    回復途中のままでも、
+    今日をちゃんと積み重ねていた感じがするよ🌙
+    `,
+
+    `
+    朝の時点から、
+    “整えながら進む”
+    を大事にしていた一日だったんだね🌱
+    `
+
+  ];
+
+  return randomPick(comments);
+}
+
+/* 🌿→🌻 回復から喜び */
+
+if (
+  morning.mood?.includes("回復") &&
+  mood.includes("喜")
+) {
+
+  const comments = [
+
+    `
+    朝はゆっくり整えようとしていた気持ちが、
+    夜にはちゃんと温かい時間へ繋がっていたんだね🌻
+    `,
+
+    `
+    回復途中のままでも、
+    今日の中にちゃんと嬉しさがあったのが素敵だと思う🌙
+    `,
+
+    `
+    無理に頑張りすぎなくても、
+    “楽しい”
+    に辿り着ける日ってあるよね🌿✨
+    `
+
+  ];
+
+  return randomPick(comments);
+}
+
+/* 🔥→🌿 焦りから回復 */
+
+if (
+  morning.mood?.includes("焦") &&
+  mood.includes("回復")
+) {
+
+  const comments = [
+
+    `
+    朝は少し急いでいた気持ちも、
+    夜にはちゃんと呼吸を戻せていたんだね☕
+    `,
+
+    `
+    焦る感覚を抱えながらも、
+    最後はちゃんと整えようとしていた夜だったんだね🌙
+    `,
+
+    `
+    “進まなきゃ”
+    だけじゃなく、
+    “休みながら進む”
+    に戻ってこれた一日だったんだね🌿
+    `
+
+  ];
+
+  return randomPick(comments);
+}
+
+/* 🌫️→🌌 不安から観察 */
+
+if (
+  morning.mood?.includes("不安") &&
+  mood.includes("違和感")
+) {
+
+  const comments = [
+
+    `
+    揺れながら始まった気持ちを、
+    最後はちゃんと見つめようとしていた夜なんだね🌌
+    `,
+
+    `
+    不安を消そうとするより、
+    “観察する”
+    を選んでいた一日だったのかもしれないね🌙
+    `,
+
+    `
+    今夜は、
+    気持ちを無理に整理するより、
+    静かに眺めていた夜だったんだね🕯️
+    `
+
+  ];
+
+  return randomPick(comments);
+}
+
+/* ☕→🌻 穏やかから喜び */
+
+if (
+  morning.mood?.includes("穏") &&
+  mood.includes("喜")
+) {
+
+  const comments = [
+
+    `
+    静かに始まった朝が、
+    ちゃんと温かい夜へ繋がっていたんだね🌻
+    `,
+
+    `
+    大きな出来事じゃなくても、
+    “今日を楽しめた”
+    感覚が残っている夜なんだね🌙
+    `,
+
+    `
+    穏やかな空気のまま、
+    今日をちゃんと育てていた一日だったんだね☕
+    `
+
+  ];
+
+  return randomPick(comments);
+}
+
 
   /* 🎨 アトリエ */
   if (areas.includes("アトリエ")) {
