@@ -28,39 +28,13 @@ function generateMorningComment(morning) {
   const goal = morning.goal || morning.theme || "";
   const areas = morning.areas || [];
 
-  // 🌿 回復途中
-  if (mood.includes("回復")) {
-    return `
-      今日は、
-      急いで進むよりも、
-      “整えながら進む”
-      を大切にしようとしている朝なんだね🌿
-    `;
-  }
+ const category =
+  pickMorningCategory(morning);
 
-  // 🎨 アトリエ
-  if (areas.includes("アトリエ")) {
-    return `
-      小さくても、
-      今日の制作の火を
-      ちゃんと灯そうとしているのが伝わってくるよ🎨
-    `;
-  }
+return randomPick(
+  MORNING_COMMENTS[category]
+);
 
-  // 🌻 目標系
-  if (goal.includes("例外")) {
-    return `
-      “自分だけは特別”
-      にしないって、
-      実はすごく誠実な目標だと思う🌻
-    `;
-  }
-
-  // 🌞 デフォルト
-  return `
-    今日という一日を、
-    ちゃんと自分で整えようとしている朝だね🌅
-  `;
 }
 
 /* =========================================================
