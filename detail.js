@@ -366,8 +366,8 @@ function renderNightLog(date, night) {
     </section>
   `;
   
-  const morningLogs =
-  readStorage("soleilMorningLogs");
+const morningLogs =
+  readStorage("soleilMorningLogs") || {};
 
 const morning =
   morningLogs[date] || {};
