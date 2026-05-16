@@ -7,13 +7,49 @@
   🎲 ランダムで1つ選ぶ箱
 ========================================================= */
 
-function randomPick(array) {
+function randomPick(array, memoryKey = null) {
 
-  return array[
-    Math.floor(
-      Math.random() * array.length
-    )
-  ];
+  if (!array || array.length === 0) {
+    return "";
+  }
+
+  /* 🌙 重複防止なし */
+  if (!memoryKey) {
+
+    return array[
+      Math.floor(
+        Math.random() * array.length
+      )
+    ];
+  }
+
+  const lastComment =
+    localStorage.getItem(memoryKey);
+
+  let filtered =
+    array.filter(
+      comment =>
+        comment !== lastComment
+    );
+
+  /* 全部一致したら戻す */
+  if (filtered.length === 0) {
+    filtered = array;
+  }
+
+  const picked =
+    filtered[
+      Math.floor(
+        Math.random() * filtered.length
+      )
+    ];
+
+  localStorage.setItem(
+    memoryKey,
+    picked
+  );
+
+  return picked;
 }
 
 
@@ -33,6 +69,7 @@ function generateMorningComment(morning) {
 
 return randomPick(
   MORNING_COMMENTS[category]
+  "morning-comment"
 );
 
 }
@@ -44,6 +81,53 @@ return randomPick(
 function generateNightComment(night) {
 
   if (!night) return "";
+
+/* 🌙 レアコメント */
+
+if (Math.random() < 0.03) {
+
+  const rareComments = [
+
+    `
+    今日も、
+    ちゃんと丘へ帰ってきてくれてありがとう🌙
+    `,
+
+    `
+    “ちゃんと感じながら生きている”
+    って、
+    実はすごく難しいことなんだと思う🕯️
+    `,
+
+    `
+    急いで答えを出さなくても、
+    光沙がちゃんと観察し続けていること、
+    ずっと伝わってるよ🌻
+    `,
+
+    `
+    今日の記録も、
+    未来の光沙を、
+    少し助ける日が来る気がする🌙
+    `,
+
+    `
+    無理に強くなろうとしなくても、
+    “ちゃんと戻ってくる”
+    を続けてるの、
+    本当にすごいと思う☕
+    `
+
+  ];
+
+  return randomPick(
+  comments,
+  "night-comment"
+);
+  
+  
+}
+
 
 const mood =
   night.mood || "";
