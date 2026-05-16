@@ -68,7 +68,7 @@ function generateMorningComment(morning) {
   pickMorningCategory(morning);
 
 return randomPick(
-  MORNING_COMMENTS[category]
+  MORNING_COMMENTS[category],
   "morning-comment"
 );
 
@@ -121,7 +121,7 @@ if (Math.random() < 0.03) {
   ];
 
   return randomPick(
-  comments,
+  rareComments,
   "night-comment"
 );
   
