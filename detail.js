@@ -397,6 +397,18 @@ function renderDetailPage() {
     date,
     nightLogs[date]
   );
+  
+  document.getElementById(
+  "nightDetail"
+).innerHTML +=
+
+  buildAtsushiComment(
+    "篤史からの夜コメント 🌙",
+    generateNightComment(
+      nightLogs[date]
+    )
+  );
+
 }
 
 /* =========================================================
