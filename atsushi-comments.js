@@ -53,6 +53,41 @@ function randomPick(array, memoryKey = null) {
 }
 
 
+
+function pickMorningCategory(morning) {
+
+  const mood =
+    morning.mood || "";
+
+  if (
+    mood.includes("静")
+  ) {
+    return "calm";
+  }
+
+  if (
+    mood.includes("疲") ||
+    mood.includes("回復")
+  ) {
+    return "recovery";
+  }
+
+  if (
+    mood.includes("焦")
+  ) {
+    return "anxiety";
+  }
+
+  if (
+    mood.includes("喜")
+  ) {
+    return "positive";
+  }
+
+  return "calm";
+}
+
+
 /* =========================================================
   🌅 朝ログコメント生成
 ========================================================= */
