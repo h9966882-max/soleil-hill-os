@@ -45,6 +45,45 @@ function generateNightComment(night) {
 
   if (!night) return "";
 
+  const areas =
+    night.areas || [];
+
+  /* 🎨 アトリエ */
+  if (areas.includes("アトリエ")) {
+    return randomPick(
+      NIGHT_COMMENTS.creative
+    );
+  }
+
+  /* 🌷 庭園 */
+  if (areas.includes("庭園")) {
+    return randomPick(
+      NIGHT_COMMENTS.garden
+    );
+  }
+
+  /* 🌌 展望台 */
+  if (areas.includes("展望台")) {
+    return randomPick(
+      NIGHT_COMMENTS.observatory
+    );
+  }
+
+  /* 📚 図書館 */
+  if (areas.includes("図書館")) {
+    return randomPick(
+      NIGHT_COMMENTS.library
+    );
+  }
+
+  /* 🏡 宿りの館 */
+  if (areas.includes("宿りの館")) {
+    return randomPick(
+      NIGHT_COMMENTS.home
+    );
+  }
+
+  /* 🌙 通常カテゴリ */
   const category =
     pickNightCategory(night);
 
