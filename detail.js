@@ -214,3 +214,30 @@ function renderMorningLog(date, morning) {
       );
   }
 }
+
+/* =========================================================
+  🌻 detailページ初期化
+========================================================= */
+
+function renderDetailPage() {
+
+  const date = getSelectedDate();
+
+  document.getElementById(
+    "dateTitle"
+  ).innerText = date;
+
+  const morningLogs =
+    readStorage("soleilMorningLogs");
+
+  renderMorningLog(
+    date,
+    morningLogs[date]
+  );
+}
+
+/* =========================================================
+  🌻 初期実行
+========================================================= */
+
+renderDetailPage();
