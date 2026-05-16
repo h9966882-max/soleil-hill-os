@@ -216,6 +216,159 @@ function renderMorningLog(date, morning) {
 }
 
 /* =========================================================
+  🌙 夜ログ表示
+========================================================= */
+
+function renderNightLog(date, night) {
+
+  const box =
+    document.getElementById("nightDetail");
+
+  if (!night) {
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = `
+    <section class="card">
+
+      <h2>🌙 夜ログ</h2>
+
+      <div class="detail-row">
+        <span class="label">
+          今日のテーマ：
+        </span>
+
+        ${showValue(night.theme)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          主感情：
+        </span>
+
+        ${showValue(night.mood)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          エネルギー：
+        </span>
+
+        ${showValue(night.energy)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          今日やったこと：
+        </span>
+
+        ${showValue(night.done)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          心が動いたこと：
+        </span>
+
+        ${showValue(night.heart)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          制作ログ：
+        </span>
+
+        ${showValue(night.create)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          思考ログ：
+        </span>
+
+        ${showValue(night.think)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          接続エリア：
+        </span>
+
+        ${renderAreaTags(night.areas)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          明日に残すこと：
+        </span>
+
+        ${showValue(night.tomorrow)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          今日の一文：
+        </span>
+
+        ${showValue(night.oneLine)}
+      </div>
+
+      <hr>
+
+      <div class="detail-row">
+        <span class="label">
+          何が起きた？：
+        </span>
+
+        ${showValue(night.trigger)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          どう解釈した？：
+        </span>
+
+        ${showValue(night.interpret)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          この感情は何を伝えている？：
+        </span>
+
+        ${showValue(night.meaning)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          今とる最適行動：
+        </span>
+
+        ${showValue(night.action)}
+      </div>
+
+      <div class="detail-row">
+        <span class="label">
+          やらない行動：
+        </span>
+
+        ${showValue(night.avoid)}
+      </div>
+
+      <button
+        onclick="location.href='log.html?date=${date}'">
+
+        夜ログを編集する
+
+      </button>
+
+    </section>
+  `;
+}
+
+
+/* =========================================================
   🌻 detailページ初期化
 ========================================================= */
 
@@ -241,3 +394,6 @@ function renderDetailPage() {
 ========================================================= */
 
 renderDetailPage();
+
+
+
