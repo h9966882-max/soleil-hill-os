@@ -410,6 +410,18 @@ if (nightLogs[date]) {
         nightLogs[date]
       )
     );
+    
+    document.getElementById(
+  "nightDetail"
+).innerHTML +=
+
+  buildAtsushiComment(
+    "篤史からの一日まとめ 🌻",
+    generateDailySummary(
+      morningLogs[date],
+      nightLogs[date]
+    )
+  );
 }
 
 }
