@@ -180,7 +180,10 @@ if (
 
   ];
 
-  return randomPick(comments);
+  return randomPick(
+  comments,
+  "night-comment"
+);
 }
 
 /* 🌿→🌻 回復から喜び */
@@ -210,7 +213,10 @@ if (
 
   ];
 
-  return randomPick(comments);
+  return randomPick(
+  comments,
+  "night-comment"
+);
 }
 
 /* 🔥→🌿 焦りから回復 */
@@ -241,7 +247,10 @@ if (
 
   ];
 
-  return randomPick(comments);
+  return randomPick(
+  comments,
+  "night-comment"
+);
 }
 
 /* 🌫️→🌌 不安から観察 */
@@ -272,7 +281,10 @@ if (
 
   ];
 
-  return randomPick(comments);
+  return randomPick(
+  comments,
+  "night-comment"
+);
 }
 
 /* ☕→🌻 穏やかから喜び */
@@ -302,7 +314,10 @@ if (
 
   ];
 
-  return randomPick(comments);
+  return randomPick(
+  comments,
+  "night-comment"
+);
 }
 
 
