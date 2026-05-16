@@ -428,32 +428,6 @@ function renderDetailPage() {
     date,
     nightLogs[date]
   );
-  
-if (nightLogs[date]) {
-
-  document.getElementById(
-    "nightDetail"
-  ).innerHTML +=
-
-    buildAtsushiComment(
-      "篤史からの夜コメント 🌙",
-      generateNightComment(
-        nightLogs[date]
-      )
-    );
-    
-    document.getElementById(
-  "nightDetail"
-).innerHTML +=
-
-  buildAtsushiComment(
-    "篤史からの一日まとめ 🌻",
-    generateDailySummary(
-      morningLogs[date],
-      nightLogs[date]
-    )
-  );
-}
 
 }
 
