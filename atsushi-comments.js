@@ -72,6 +72,9 @@ function generateNightComment(night) {
 
   const mood = night.mood || "";
   const energy = Number(night.energy || 0);
+  
+  const areas = night.areas || [];
+  
 
   // 🌿 疲れ系
   if (
@@ -85,6 +88,161 @@ function generateNightComment(night) {
       ちゃんと休もうね🌙
     `;
   }
+  
+  // 🎨 アトリエ反応
+if (
+  areas.includes("アトリエ")
+) {
+
+const atelierComments = [
+
+  `
+  今日は、
+  “つくる時間”
+  をちゃんと大事にしていた夜なんだね🎨
+  `,
+
+  `
+  小さくても、
+  “手を動かす時間”
+  をちゃんと持てていたの、すごく良いと思う🎨
+  `,
+
+  `
+  今日は、
+  自分の中にあるものを、
+  少しずつ形にしていた夜なんだね🌻
+  `
+
+];
+
+return randomPick(atelierComments);
+}
+
+// 🌷 庭園反応
+if (
+  areas.includes("庭園")
+) {
+
+const gardenComments = [
+
+  `
+  今日は、
+  “整える時間”
+  をちゃんと自分に渡していた夜なんだね🌷
+  `,
+
+  `
+  焦って進むよりも、
+  “ちゃんと呼吸できる形”
+  を選ぼうとしていた夜だったんだね🌿
+  `,
+
+  `
+  今日は、
+  自分の内側を、
+  少しずつ静かに整えていた感じがするよ🌷
+  `
+
+];
+
+return randomPick(gardenComments);
+}
+
+// 🌌 展望台反応
+if (
+  areas.includes("展望台")
+) {
+
+const observatoryComments = [
+
+  `
+  今日は、
+  ちゃんと立ち止まって、
+  “少し高い場所から”
+  自分を見ようとしていた夜なんだね🌌
+  `,
+
+  `
+  今日は、
+  目の前だけじゃなく、
+  “少し遠くの景色”
+  まで見ようとしていた感じがするよ🌠
+  `,
+
+  `
+  焦って答えを出すよりも、
+  “まず全体を見る”
+  を大事にしていた夜だったんだね🌌
+  `
+
+];
+
+return randomPick(observatoryComments);
+}
+
+  // 📚 図書館反応
+if (
+  areas.includes("図書館")
+) {
+
+const libraryComments = [
+
+  `
+  今日は、
+  “理解する時間”
+  を静かに積み重ねていた夜なんだね📚
+  `,
+
+  `
+  今日の図書館時間、
+  “知る”
+  だけじゃなく、
+  “ちゃんと咀嚼する”
+  に近かった気がするよ📖
+  `,
+
+  `
+  今日は、
+  自分の中にある考えを、
+  少しずつ整理していた夜だったんだね📚
+  `
+
+];
+
+return randomPick(libraryComments);
+}
+
+// 🏡 宿りの館反応
+if (
+  areas.includes("宿りの館")
+) {
+
+const innComments = [
+
+  `
+  今日は、
+  “ちゃんと帰ってくる時間”
+  を自分に渡していた夜なんだね🏡
+  `,
+
+  `
+  外に向かうだけじゃなく、
+  “安心できる場所へ戻る”
+  を大事にしていた夜だったんだね🌙
+  `,
+
+  `
+  今日は、
+  無理に頑張り続けるより、
+  “ちゃんと休める形”
+  を選ぼうとしていた感じがするよ🏡
+  `
+
+];
+
+return randomPick(innComments);
+}
 
   // 🌻 喜び系
   if (
@@ -98,6 +256,20 @@ function generateNightComment(night) {
       すごく大切だと思う🌻
     `;
   }
+  
+  // 🌧️ 不安系
+if (
+  mood.includes("不安") ||
+  mood.includes("焦")
+) {
+
+  return `
+    今日は、
+    ちゃんと立ち止まって
+    自分の内側を見ようとしていた夜だね🌙
+  `;
+}
+
 
   // 🌙 デフォルト
   return `
