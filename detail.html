@@ -296,7 +296,9 @@ function renderTaskList(tasks, oldAction = "") {
   🌅 朝ログ表示
 ========================================================= */
 function renderMorningLog(date, morning) {
-  const box = document.getElementById("morningDetail");
+
+  const box =
+    document.getElementById("morningDetail");
 
   if (!morning) {
     box.innerHTML = "";
@@ -305,31 +307,81 @@ function renderMorningLog(date, morning) {
 
   box.innerHTML = `
     <section class="card">
+
       <h2>🌅 朝ログ</h2>
 
-      <div class="detail-row"><span class="label">今日の目標：</span>${showValue(morning.goal || morning.theme)}</div>
-      <div class="detail-row"><span class="label">今の状態：</span>${showValue(morning.mood)}</div>
+      <!-- 🌻 今日の目標 -->
+      <div class="detail-row">
+        <span class="label">今日の目標：</span>
+        ${showValue(
+          morning.goal ||
+          morning.theme
+        )}
+      </div>
 
-      <div class="detail-row"><span class="label">今日のやりたいこと：</span></div>
-      ${renderTaskList(morning.tasks, morning.action)}
+      <!-- 🌿 今の状態 -->
+      <div class="detail-row">
+        <span class="label">今の状態：</span>
+        ${showValue(morning.mood)}
+      </div>
 
-      <div class="detail-row"><span class="label">行きたいエリア：</span>${renderAreaTags(morning.areas)}</div>
-      <div class="detail-row"><span class="label">今日の指針：</span>${showValue(morning.guideline || morning.care)}</div>
-      <div class="detail-row"><span class="label">今日の小さな楽しみ：</span>${showValue(morning.smallJoy || morning.message)}</div>
+      <!-- ✅ 今日のやりたいこと -->
+      <div class="detail-row">
+        <span class="label">今日のやりたいこと：</span>
+      </div>
 
-      <div id="morningComment" class="comment-slot"></div>
+      ${renderTaskList(
+        morning.tasks,
+        morning.action
+      )}
 
-      <!-- 🌻 今後ここに朝コメントを入れる -->
+      <!-- 🗺️ 行きたいエリア -->
+      <div class="detail-row">
+        <span class="label">行きたいエリア：</span>
+        ${renderAreaTags(morning.areas)}
+      </div>
+
+      <!-- 🌻 今日の指針 -->
+      <div class="detail-row">
+        <span class="label">今日の指針：</span>
+        ${showValue(
+          morning.guideline ||
+          morning.care
+        )}
+      </div>
+
+      <!-- ☀️ 今日の小さな楽しみ -->
+      <div class="detail-row">
+        <span class="label">今日の小さな楽しみ：</span>
+        ${showValue(
+          morning.smallJoy ||
+          morning.message
+        )}
+      </div>
+
+      <!-- 🌻 篤史コメント -->
       <div
         id="morningComment"
         class="comment-slot">
       </div>
 
-      <button onclick="location.href='morninglog.html?date=${date}'">
+      <!-- ✏️ 編集ボタン -->
+      <button
+        onclick="location.href='morninglog.html?date=${date}'">
         朝ログを編集する
       </button>
+
     </section>
   `;
+
+  /* =========================================================
+    🌻 篤史コメント生成
+  ========================================================== */
+  document.getElementById("morningComment").innerHTML =
+    buildAtsushiComment(
+      "篤史からの朝コメント 🌅",
+      generateMorningComment(morning)
+    );
 }
 
     /* =========================================================
@@ -530,5 +582,8 @@ renderObservatoryLog(date, observatoryLog);
 
     renderDetailPage();
   </script>
+  
+  <script src="atsushi-comments.js"></script>
+  
 </body>
 </html>
