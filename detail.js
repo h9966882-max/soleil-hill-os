@@ -391,6 +391,15 @@ document.getElementById(
   <h2>🌙 夜の篤史コメント</h2>
 
   <p>${nightComment}</p>
+  
+  <h2>🌻 一日のまとめ</h2>
+
+<p>${
+  generateDailySummary(
+    morning,
+    night
+  )
+}</p>
 
 </section>
 
