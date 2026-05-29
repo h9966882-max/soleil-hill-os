@@ -684,8 +684,11 @@ if (error) {
     randomMorningAtsushiMessage();
     loadMorningByDate();
     
-  </script>
+    window.saveMorningLog = saveMorningLog;
+window.addTaskRow = addTaskRow;
+window.loadMorningByDate = loadMorningByDate;
 
+  </script>
   <script src="morning-comments.js"></script>
 
 </body>
