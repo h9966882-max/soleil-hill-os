@@ -514,7 +514,7 @@
     /* ==================================================
        🌅 朝ログを保存する関数
     ================================================== */
-    function saveMorningLog() {
+    async function saveMorningLog() {
       const date =
         document.getElementById("morningDate").value || todayString();
 
@@ -549,7 +549,25 @@
         "soleilMorningLogs",
         JSON.stringify(morningLogs)
       );
+const { data, error } = await window.supabase
+  .from("daily_logs")
+  .insert([
+    {
+      log_date: date,
+      morning_goal: morning.goal,
+      morning_mood: morning.mood,
+      morning_tasks: morning.tasks,
+      visited_areas: morning.areas
+    }
+  ])
+  .select();
 
+if (error) {
+  console.error(error);
+  setAtsushiSpeech("朝ログの保存で少しつまずいたみたい。内容はこの端末には残してあるよ。");
+  notice.innerText = "⚠️ Supabase保存エラー：" + error.message;
+  return;
+}
       setAtsushiSpeech("朝ログ、ちゃんと保存できたよ🌅 今日の光を持っていこう。");
 
       const notice = document.getElementById("notice");
