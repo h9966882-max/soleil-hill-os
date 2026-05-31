@@ -515,9 +515,11 @@
        🌅 朝ログを保存する関数
     ================================================== */
     async function saveMorningLog() {
-      const date =
-        document.getElementById("morningDate").value || todayString();
+  const notice = document.getElementById("notice");
 
+  const date =
+    document.getElementById("morningDate").value || todayString();
+    
       const tasks = getMorningTasks();
 
       const morning = {
@@ -570,7 +572,6 @@ if (error) {
 }
       setAtsushiSpeech("朝ログ、ちゃんと保存できたよ🌅 今日の光を持っていこう。");
 
-      const notice = document.getElementById("notice");
       notice.innerText = "🌅 朝ログを保存しました";
 
       setTimeout(() => {
