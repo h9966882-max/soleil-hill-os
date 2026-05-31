@@ -436,8 +436,22 @@ function getArchiveMeta(date, stores) {
     /* =========================================================
       📖 過去ログ一覧を月ごとに描画
     ========================================================== */
-    function renderArchive() {
-      const stores = getAllLogStores();
+ <script type="module">
+  import { supabase } from "./js/supabaseClient.js";
+  window.supabase = supabase;
+</script>
+
+
+async function renderArchive() {
+
+  const { data, error } = await window.supabase
+    .from("daily_logs")
+    .select("*");
+
+  console.log("daily_logs", data, error);
+
+  const stores = getAllLogStores();
+  
       const dates = collectDailyDates(stores);
       const list = document.getElementById("archiveList");
 
