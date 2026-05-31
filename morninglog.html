@@ -552,24 +552,32 @@
         "soleilMorningLogs",
         JSON.stringify(morningLogs)
       );
-const { data, error } = await window.supabase
-  .from("daily_logs")
-  .insert([
-    {
-      log_date: date,
-      morning_goal: morning.goal,
-      morning_mood: morning.mood,
-      morning_tasks: morning.tasks,
-      visited_areas: morning.areas
-    }
-  ])
-  .select();
-  
-alert(JSON.stringify({ data, error }, null, 2));
+notice.innerText = "🌻 端末保存完了。Supabaseへ送信中...";
 
-if (error) {
+try {
+  if (!window.supabase) {
+    throw new Error("window.supabase が読み込まれていません");
+  }
+
+  const { data, error } = await window.supabase
+    .from("daily_logs")
+    .insert([
+      {
+        log_date: date,
+        morning_goal: morning.goal,
+        morning_mood: morning.mood
+      }
+    ])
+    .select();
+
+  if (error) {
+    throw error;
+  }
+
+  notice.innerText = "🌅 Supabaseにも保存しました";
+
+} catch (error) {
   console.error(error);
-  setAtsushiSpeech("朝ログの保存で少しつまずいたみたい。内容はこの端末には残してあるよ。");
   notice.innerText = "⚠️ Supabase保存エラー：" + error.message;
   return;
 }
