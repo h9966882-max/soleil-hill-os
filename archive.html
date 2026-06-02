@@ -442,16 +442,9 @@ function getArchiveMeta(date, stores) {
 </script>
 
 
-async function renderArchive() {
+function renderArchive() {
 
-  const { data, error } = await window.supabase
-    .from("daily_logs")
-    .select("*");
-
-  console.log("daily_logs", data, error);
-
-  const stores = getAllLogStores();
-  
+      const stores = getAllLogStores();
       const dates = collectDailyDates(stores);
       const list = document.getElementById("archiveList");
 
