@@ -562,10 +562,12 @@ try {
   const { data, error } = await window.supabase
     .from("daily_logs")
     .insert([
-      {
-        log_date: date,
+    {
+      log_date: date,
         morning_goal: morning.goal,
-        morning_mood: morning.mood
+        morning_mood: morning.mood,
+        morning_tasks: morning.tasks,
+        visited_areas: morning.areas
       }
     ])
     .select();
