@@ -535,6 +535,17 @@ function renderArchive() {
         mood: row.morning_mood || "",
         tasks: row.morning_tasks || [],
         areas: row.visited_areas || [],
+
+        guideline: row.morning_guideline || "",
+        smallJoy: row.morning_small_joy || "",
+
+        theme: row.morning_goal || "",
+        action: Array.isArray(row.morning_tasks)
+          ? row.morning_tasks.map(task => `${task.done ? "☑" : "☐"} ${task.text}`).join("\n")
+          : "",
+        care: row.morning_guideline || "",
+        message: row.morning_small_joy || "",
+
         savedAt: row.created_at || new Date().toISOString()
       };
     });
