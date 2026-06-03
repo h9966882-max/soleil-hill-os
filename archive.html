@@ -517,5 +517,35 @@ function renderArchive() {
     ========================================================== */
     renderArchive();
   </script>
+  <script type="module">
+  import { supabase } from "./js/supabaseClient.js";
+
+  const { data, error } = await supabase
+    .from("daily_logs")
+    .select("*")
+    .order("log_date", { ascending: false });
+
+  if (!error && data) {
+    const morningLogs = JSON.parse(localStorage.getItem("soleilMorningLogs") || "{}");
+
+    data.forEach(row => {
+      morningLogs[row.log_date] = {
+        date: row.log_date,
+        goal: row.morning_goal || "",
+        mood: row.morning_mood || "",
+        tasks: row.morning_tasks || [],
+        areas: row.visited_areas || [],
+        savedAt: row.created_at || new Date().toISOString()
+      };
+    });
+
+    localStorage.setItem("soleilMorningLogs", JSON.stringify(morningLogs));
+
+    if (typeof renderArchive === "function") {
+      renderArchive();
+    }
+  }
+</script>
+  
 </body>
 </html>
